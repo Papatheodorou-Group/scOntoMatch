@@ -91,6 +91,7 @@ ontoMatch <- function(adata1, adata2, anno_col='authors_cell_type_-_ontology_lab
 
   mappings = getOntoMapping(ont = ont, onts1 = onts1, onts2 = onts2)
 
+
   ad_one$obs[["cell_type_mapped_ontology"]] = as.character(ad_one$obs[[anno_col]])
   ad_two$obs[["cell_type_mapped_ontology"]] = as.character(ad_two$obs[[anno_col]])
 
@@ -98,6 +99,7 @@ ontoMatch <- function(adata1, adata2, anno_col='authors_cell_type_-_ontology_lab
     toTerm <- mappings[fromTerm]
     fromName = ont$name[names(ont$id[ont$id == fromTerm])]
     toName = ont$name[names(ont$id[ont$id == toTerm])]
+    message(paste("mapping from name ", fromName, " to name ", toName, sep = ""))
     ad_one$obs[which(ad_one$obs[[anno_col]] == fromName), "cell_type_mapped_ontology"] <- toName
     ad_two$obs[which(ad_two$obs[[anno_col]] == fromName), "cell_type_mapped_ontology"] <- toName
 
