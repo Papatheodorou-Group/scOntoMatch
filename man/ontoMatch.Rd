@@ -9,8 +9,8 @@ Match the ontology annotation of several adata files}
 onto.match(
   adata1,
   adata2,
-  anno_col,
-  onto_id_col,
+  anno_col = "authors_cell_type_-_ontology_labels",
+  onto_id_col = "authors_cell_type_-_ontology_labels_ontology",
   obo_file,
   propagate_relationships = c("is_a", "part_of")
 )

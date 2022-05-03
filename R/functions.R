@@ -60,7 +60,7 @@ get.onto.mapping <- function(ont, onts1, onts2){
 #' @export
 
 
-onto.match <- function(adata1, adata2, anno_col, onto_id_col, obo_file, propagate_relationships = c('is_a', 'part_of')) {
+onto.match <- function(adata1, adata2, anno_col='authors_cell_type_-_ontology_labels', onto_id_col='authors_cell_type_-_ontology_labels_ontology', obo_file, propagate_relationships = c('is_a', 'part_of')) {
   message("start matching the ontology annotation")
   ont <- ontologyIndex::get_OBO(obo_file, propagate_relationships = propagate_relationships)
   ad_one = anndata::read_h5ad(adata1)
