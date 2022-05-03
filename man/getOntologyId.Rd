@@ -4,18 +4,14 @@
 \alias{getOntologyId}
 \title{Get a names list of ontology and id by name}
 \usage{
-getOntologyId(
-  adata,
-  anno_col = "authors_cell_type_-_ontology_labels",
-  obo_object
-)
+getOntologyId(adata, anno_col = "authors_cell_type_-_ontology_labels", ont)
 }
 \arguments{
 \item{adata}{adata object}
 
 \item{anno_col}{the cell ontology text annotation column name}
 
-\item{obo_object}{obo object}
+\item{ont}{ontology object}
 }
 \value{
 a named list mapping ontology id and ontology name

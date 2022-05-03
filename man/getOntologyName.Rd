@@ -7,7 +7,7 @@
 getOntologyName(
   adata,
   onto_id_col = "authors_cell_type_-_ontology_labels_ontology",
-  obo_object
+  ont
 )
 }
 \arguments{
@@ -15,7 +15,7 @@ getOntologyName(
 
 \item{onto_id_col}{if also have ontology id column for direct mapping}
 
-\item{obo_object}{obo object}
+\item{ont}{ontology object}
 }
 \value{
 a named list mapping ontology id and ontology name
