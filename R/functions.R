@@ -53,16 +53,18 @@ getOntoMapping <- function(ont, onts1, onts2){
 #' @param adata1 one anndata file path
 #' @param adata2 the other anndata file path
 #' @param anno_col the cell ontology text annotation column name
-#' @param onto_if_col if also have ontology id column for direct mapping
+#' @param onto_id_col if also have ontology id column for direct mapping
+#' @param obo_file obo file path
+#' @param propagate_relationships relationships for reading in obo file
 #' @return a list of adata files with annotation ontology mapped to each-other
 #' @importFrom ontologyIndex get_OBO
 #' @importFrom anndata read_h5ad write_h5ad
 #' @export
 
 
-ontoMatch <- function(adata1, adata2, anno_col='authors_cell_type_-_ontology_labels', onto_id_col='authors_cell_type_-_ontology_labels_ontology', obo_file, propagate_relationships = c('is_a', 'part_of')) {
+ontoMatch <- function(adata1, adata2, anno_col='authors_cell_type_-_ontology_labels', onto_id_col='authors_cell_type_-_ontology_labels_ontology', obo_file, propagate_relationships = c('is_a', 'part_of'), ...) {
   message("start matching the ontology annotation")
-  ont <- ontologyIndex::get_OBO(obo_file, propagate_relationships = propagate_relationships)
+  ont <- ontologyIndex::get_OBO(obo_file, propagate_relationships = propagate_relationships, ...)
   ad_one = anndata::read_h5ad(adata1)
   ad_two = anndata::read_h5ad(adata2)
   message(paste0("adata1 has cell types: ", paste(levels(factor(ad_one$obs[[anno_col]])), collapse = ', ')))
@@ -108,6 +110,37 @@ ontoMatch <- function(adata1, adata2, anno_col='authors_cell_type_-_ontology_lab
 
 
 }
+
+
+#' Get a names list of ontology and id by name
+#' @name getOntologyId
+#' @param adata adata object
+#' @param anno_col the cell ontology text annotation column name
+#' @param obo_object obo object
+#' @return a named list mapping ontology id and ontology name
+#' @export
+
+
+getOntologyId <- function(adata, anno_col='authors_cell_type_-_ontology_labels', obo_object){
+
+  return(obo_object$name[names(obo_object$id[obo_object$name %in% levels(factor(adata$obs[[anno_col]]))])])
+
+}
+
+#' Get a names list of ontology and id by id
+#' @name getOntologyName
+#' @param adata adata object
+#' @param onto_id_col if also have ontology id column for direct mapping
+#' @param obo_object obo object
+#' @return a named list mapping ontology id and ontology name
+#' @export
+
+
+getOntologyName <- function(adata, onto_id_col='authors_cell_type_-_ontology_labels_ontology', obo_object){
+
+    return(obo_object$name[names(obo_object$id[obo_object$id %in% levels(factor(adata$obs[[onto_id_col]]))])])
+}
+
 
 #' Helper function to fill queries in plotOntoTree
 fill_query = function(all, query) {

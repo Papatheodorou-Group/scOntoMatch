@@ -11,7 +11,8 @@ ontoMatch(
   anno_col = "authors_cell_type_-_ontology_labels",
   onto_id_col = "authors_cell_type_-_ontology_labels_ontology",
   obo_file,
-  propagate_relationships = c("is_a", "part_of")
+  propagate_relationships = c("is_a", "part_of"),
+  ...
 )
 }
 \arguments{
@@ -21,7 +22,11 @@ ontoMatch(
 
 \item{anno_col}{the cell ontology text annotation column name}
 
-\item{onto_if_col}{if also have ontology id column for direct mapping}
+\item{onto_id_col}{if also have ontology id column for direct mapping}
+
+\item{obo_file}{obo file path}
+
+\item{propagate_relationships}{relationships for reading in obo file}
 }
 \value{
 a list of adata files with annotation ontology mapped to each-other
