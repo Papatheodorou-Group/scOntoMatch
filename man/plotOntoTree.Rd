@@ -4,7 +4,14 @@
 \alias{plotOntoTree}
 \title{Plot a tree representation of ontology terms}
 \usage{
-plotOntoTree(ont, onts, plot_ancestors = TRUE, ont_query = NULL, ...)
+plotOntoTree(
+  ont,
+  onts,
+  plot_ancestors = TRUE,
+  ont_query = NULL,
+  roots = NULL,
+  ...
+)
 }
 \arguments{
 \item{ont}{ontology object}
@@ -14,6 +21,8 @@ plotOntoTree(ont, onts, plot_ancestors = TRUE, ont_query = NULL, ...)
 \item{plot_ancestors}{if plot ancestors or not}
 
 \item{ont_query}{query ontology to highlight in the tree}
+
+\item{roots}{root ontology in tree}
 }
 \value{
 an ontology tree plot

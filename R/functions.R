@@ -166,12 +166,13 @@ fill_query = function(all, query) {
 #' @param onts ontology ids to plot
 #' @param plot_ancestors if plot ancestors or not
 #' @param ont_query query ontology to highlight in the tree
+#' @param roots root ontology in tree
 #' @return an ontology tree plot
 #' @importFrom ontologyPlot onto_plot
-#' @importFrom ontologyIndex get_ancestors
+#' @importFrom ontologyIndex get_ancestors intersection_with_descendants
 #' @export
 
-plotOntoTree <- function(ont, onts, plot_ancestors=TRUE, ont_query=NULL, ...){
+plotOntoTree <- function(ont, onts, plot_ancestors=TRUE, ont_query=NULL, roots = NULL, ...){
 
   if(plot_ancestors){
 
@@ -179,6 +180,11 @@ plotOntoTree <- function(ont, onts, plot_ancestors=TRUE, ont_query=NULL, ...){
   } else {
 
     terms = onts
+  }
+
+  if(!is.null(roots)){
+
+    terms = ontologyIndex::intersection_with_descendants(ontology = ont, roots = roots, terms = terms)
   }
 
   plt = ontologyPlot::onto_plot(ontology = ont,
