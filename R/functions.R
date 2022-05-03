@@ -136,7 +136,7 @@ fill_query = function(all, query) {
 #' @importFrom ontologyIndex get_ancestors
 #' @export
 
-plot.onto.tree <- function(ont, onts, plot_ancestors=TRUE, ont_query, ...){
+plot.onto.tree <- function(ont, onts, plot_ancestors=TRUE, ont_query=NULL, ...){
 
   if(plot_ancestors){
 
