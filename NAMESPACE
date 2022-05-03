@@ -3,7 +3,6 @@
 S3method(plot,onto.tree)
 export(get.onto.mapping)
 export(onto.match)
-export(ontoMatch)
 importFrom(anndata,read_h5ad)
 importFrom(anndata,write_h5ad)
 importFrom(ontologyIndex,get_OBO)

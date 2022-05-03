@@ -10,12 +10,12 @@ get.onto.mapping(ont, onts1, onts2)
 \arguments{
 \item{ont}{the ontology object from get_OBO}
 
-\item{onts1}{a named list looks like ontology_id:ontology name}
+\item{onts1}{a character vector of ontology id}
 
-\item{onts2}{a named list looks like ontology_id:ontology name}
+\item{onts2}{a character vector of ontology id}
 }
 \value{
-a names list for ontology id mapping
+a names list for ontology id mapping looks like ontology_id:ontology_id
 }
 \description{
 match ontology terms by direct mapping and mapping descendants to ancestors

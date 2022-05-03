@@ -1,9 +1,9 @@
 #' match ontology terms by direct mapping and mapping descendants to ancestors
 #' @name getOntoMapping
 #' @param ont the ontology object from get_OBO
-#' @param onts1 a named list looks like ontology_id:ontology name
-#' @param onts2 a named list looks like ontology_id:ontology name
-#' @return a names list for ontology id mapping
+#' @param onts1 a character vector of ontology id
+#' @param onts2 a character vector of ontology id
+#' @return a names list for ontology id mapping looks like ontology_id:ontology_id
 #' @importFrom ontologyIndex get_ancestors
 #' @export
 
