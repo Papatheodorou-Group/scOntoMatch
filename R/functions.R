@@ -116,31 +116,29 @@ ontoMatch <- function(adata1, adata2, anno_col='authors_cell_type_-_ontology_lab
 
 #' Get a names list of ontology and id by name
 #' @name getOntologyId
-#' @param adata adata object
-#' @param anno_col the cell ontology text annotation column name
+#' @param onto_name character vector of ontology names
 #' @param ont ontology object
 #' @return a named list mapping ontology id and ontology name
 #' @export
 
 
-getOntologyId <- function(adata, anno_col='authors_cell_type_-_ontology_labels', ont){
+getOntologyId <- function(onto_name, ont){
 
-  return(ont$name[names(ont$id[ont$name %in% levels(factor(adata$obs[[anno_col]]))])])
+  return(ont$name[names(ont$id[ont$name %in% levels(factor(onto_name))])])
 
 }
 
 #' Get a names list of ontology and id by id
 #' @name getOntologyName
-#' @param adata adata object
-#' @param onto_id_col if also have ontology id column for direct mapping
+#' @param onto_id character vector of ontology ids
 #' @param ont ontology object
 #' @return a named list mapping ontology id and ontology name
 #' @export
 
 
-getOntologyName <- function(adata, onto_id_col='authors_cell_type_-_ontology_labels_ontology', ont){
+getOntologyName <- function(onto_id, ont){
 
-    return(ont$name[names(ont$id[ont$id %in% levels(factor(adata$obs[[onto_id_col]]))])])
+    return(ont$name[names(ont$id[ont$id %in% levels(factor(onto_id))])])
 }
 
 

@@ -4,16 +4,10 @@
 \alias{getOntologyName}
 \title{Get a names list of ontology and id by id}
 \usage{
-getOntologyName(
-  adata,
-  onto_id_col = "authors_cell_type_-_ontology_labels_ontology",
-  ont
-)
+getOntologyName(onto_id, ont)
 }
 \arguments{
-\item{adata}{adata object}
-
-\item{onto_id_col}{if also have ontology id column for direct mapping}
+\item{onto_id}{character vector of ontology ids}
 
 \item{ont}{ontology object}
 }
