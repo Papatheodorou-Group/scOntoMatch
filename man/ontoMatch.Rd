@@ -29,7 +29,7 @@ ontoMatch(
 \item{propagate_relationships}{relationships for reading in obo file}
 }
 \value{
-a list of adata files with annotation ontology mapped to each-other
+a list of adata files with annotation ontology mapped to each-other in obs[['cell_type_mapped_ontology']]
 }
 \description{
 Core function of scOntoMatch

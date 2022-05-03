@@ -22,7 +22,7 @@ plotOntoTree(
 
 \item{ont_query}{query ontology to highlight in the tree}
 
-\item{roots}{root ontology in tree}
+\item{roots}{root ontology in tree, default "animal cells" in cell ontology}
 }
 \value{
 an ontology tree plot

@@ -9,6 +9,7 @@
 
 getOntoMapping <- function(ont, onts1, onts2){
 
+  ## direct matching
   intersection <- intersect(onts1, onts2)
   mappings = c()
   mappings[intersection] = intersection
@@ -20,6 +21,7 @@ getOntoMapping <- function(ont, onts1, onts2){
   ancestors_onts_1 <- lapply(onts1, function(x) ontologyIndex::get_ancestors(ont, x))
   ancestors_onts_2 <- lapply(onts2, function(x) ontologyIndex::get_ancestors(ont, x))
 
+  # a term in onts1 is the ancestor of other term(s) in onts2
   one_ancestors_of_two <- lapply(structure(onts1, names=onts1), function(x) onts2[unlist(lapply(ancestors_onts_2, function(y) x %in% y))])
   one_ancestors_of_two <- one_ancestors_of_two[unlist(lapply(one_ancestors_of_two, function(x) length(x) > 0))]
 
@@ -33,6 +35,8 @@ getOntoMapping <- function(ont, onts1, onts2){
   ancestors_onts_1 <- lapply(onts1, function(x) ontologyIndex::get_ancestors(ont, x))
   ancestors_onts_2 <- lapply(onts2, function(x) ontologyIndex::get_ancestors(ont, x))
 
+  # a term in onts2 is the ancestor of other term(s) in onts1
+
   two_ancestors_of_one <- lapply(structure(onts2, names = onts2), function(x) onts1[unlist(lapply(ancestors_onts_1, function(y) x %in% y))])
   two_ancestors_of_one <- two_ancestors_of_one[unlist(lapply(two_ancestors_of_one, function(x) length(x) > 0))]
 
@@ -41,6 +45,7 @@ getOntoMapping <- function(ont, onts1, onts2){
     onts2 <- onts2[onts2 != ancestor]
     onts1 <- onts1[! onts1 %in% two_ancestors_of_one[[ancestor]]]
   }
+
   return(mappings)
 
 }
@@ -56,9 +61,9 @@ getOntoMapping <- function(ont, onts1, onts2){
 #' @param onto_id_col if also have ontology id column for direct mapping
 #' @param obo_file obo file path
 #' @param propagate_relationships relationships for reading in obo file
-#' @return a list of adata files with annotation ontology mapped to each-other
+#' @return a list of adata files with annotation ontology mapped to each-other in obs[['cell_type_mapped_ontology']]
 #' @importFrom ontologyIndex get_OBO
-#' @importFrom anndata read_h5ad write_h5ad
+#' @importFrom anndata read_h5ad
 #' @export
 
 
@@ -99,7 +104,7 @@ ontoMatch <- function(adata1, adata2, anno_col='authors_cell_type_-_ontology_lab
     toTerm <- mappings[fromTerm]
     fromName = ont$name[names(ont$id[ont$id == fromTerm])]
     toName = ont$name[names(ont$id[ont$id == toTerm])]
-    message(paste("mapping from name ", fromName, " to name ", toName, sep = ""))
+    message(paste("mapping from name: ", fromName, " to name: ", toName, sep = ""))
     ad_one$obs[which(ad_one$obs[[anno_col]] == fromName), "cell_type_mapped_ontology"] <- toName
     ad_two$obs[which(ad_two$obs[[anno_col]] == fromName), "cell_type_mapped_ontology"] <- toName
 
@@ -142,6 +147,58 @@ getOntologyName <- function(onto_id, ont){
 }
 
 
+
+#' In a matched ontology tree there could be simultaneously ancestral terms and descendant terms within each dataset,
+#' this function takes the output of ontoMatch and merge descendant terms to ancestor terms, while not over-merge
+#' @name ontoMatchMinimal
+#' @param ont ontology object
+#' @param adatas a list of adata files from the output of ontoMatch
+#' @return a list of adata files with minimal ontology mapped to each other in obs[['cell_type_mapped_ontology_base']]
+#' @importFrom ontologyIndex get_OBO get_ancestors get_descendants minimal_set
+#' @export
+
+
+ontoMatchMinimal <- function(adatas, ont ){
+
+  # the new ontology terms that has been mapped between datasets
+  new_all = unique(c(names(getOntologyId(adatas[[1]]$obs[['cell_type_mapped_ontology']], ont = ont)), names(getOntologyId(adatas[[2]]$obs[['cell_type_mapped_ontology']], ont = ont))))
+
+  # minimal_set(ont, new_all) is all the leaf terms in the current joint ontology tree
+  # setdiff(new_all, minimal_set(ont, new_all)) contains intermediate terms
+  # minimal_set(ont, setdiff(new_all, minimal_set(ont, new_all))) contains leaf terms among intermediate terms to avoid over-merging
+  # that gives the removed_terms for us to match to its ancestor in intermediate terms
+  removed_terms = minimal_set(ont, setdiff(new_all, minimal_set(ont, new_all)))
+
+  new_terms_one = names(getOntologyId(adatas[[1]]$obs[['cell_type_mapped_ontology']], ont = ont))
+  new_terms_two = names(getOntologyId(adatas[[2]]$obs[['cell_type_mapped_ontology']], ont = ont))
+
+  # get the mapping between elements to match to ancestor and the ancestor
+  # it gives the same result to use new_terms_one or new_terms_two in the following line
+  to_minimize = new_terms_one[new_terms_one %in% get_descendants(ontology = ont, roots = removed_terms) & !(new_terms_one %in% removed_terms)]
+  common_base = lapply(structure(to_minimize, names = to_minimize), function(x) removed_terms[unlist(lapply(removed_terms, function(y) x %in% get_descendants(ontology = ont, roots = y)))])
+  common_base <- common_base[unlist(lapply(common_base, function(x) length(x) > 0))]
+  mappings = unlist(common_base, use.names = TRUE)
+
+  # from previously unified annotation
+  adatas[[1]]$obs[['cell_type_mapped_ontology_base']] = adatas[[1]]$obs[['cell_type_mapped_ontology']]
+  adatas[[2]]$obs[['cell_type_mapped_ontology_base']] = adatas[[2]]$obs[['cell_type_mapped_ontology']]
+
+  ## perform mapping
+  for (fromTerm in names(mappings)){
+    toTerm <- mappings[fromTerm]
+    fromName = ont$name[names(ont$id[ont$id == fromTerm])]
+    toName = ont$name[names(ont$id[ont$id == toTerm])]
+    message(paste("mapping from name: ", fromName, " to name: ", toName, sep = ""))
+    adatas[[1]]$obs[which(adatas[[1]]$obs[['cell_type_mapped_ontology']] == fromName), "cell_type_mapped_ontology_base"] <- toName
+    adatas[[2]]$obs[which(adatas[[2]]$obs[['cell_type_mapped_ontology']] == fromName), "cell_type_mapped_ontology_base"] <- toName
+
+  }
+
+  return(adatas)
+}
+
+
+
 #' Helper function to fill queries in plotOntoTree
 fill_query = function(all, query) {
 
@@ -164,7 +221,7 @@ fill_query = function(all, query) {
 #' @param onts ontology ids to plot
 #' @param plot_ancestors if plot ancestors or not
 #' @param ont_query query ontology to highlight in the tree
-#' @param roots root ontology in tree
+#' @param roots root ontology in tree, default "animal cells" in cell ontology
 #' @return an ontology tree plot
 #' @importFrom ontologyPlot onto_plot
 #' @importFrom ontologyIndex get_ancestors intersection_with_descendants
@@ -191,3 +248,32 @@ plotOntoTree <- function(ont, onts, plot_ancestors=TRUE, ont_query=NULL, roots =
   return(plt)
 
 }
+
+
+#' Plot a ontology tree with matched ontology from ontoMatch
+#' @name plotMatchedOntoTree
+#' @param ont ontology object
+#' @param adatas a list of adata files as the output of ontoMatch
+#' @param anno_col the cell ontology text annotation column name to plot, could be 'cell_type_mapped_ontology' or 'cell_type_mapped_ontology_base'
+#' @param roots root ontology in tree to plot, default "animal cells" in cell ontology
+#' @return a lit of matched ontology tree plot
+#' @importFrom ontologyPlot onto_plot
+#' @importFrom ontologyIndex get_ancestors intersection_with_descendants
+#' @export
+#'
+plotMatchedOntoTree <- function(adatas, ont, anno_col, roots = c("CL:0000548"),  ...){
+
+  all = unique(c(get_ancestors(ontology = ont, terms = names(getOntologyId(adatas[[2]]$obs[[anno_col]], ont = ont))),
+                 get_ancestors(ontology = ont, terms = names(getOntologyId(adatas[[1]]$obs[[anno_col]], ont = ont)))))
+
+  plt1 = plotOntoTree(ont = ont, onts = all, ont_query = names(getOntologyId(adatas[[1]]$obs[[anno_col]], ont = ont)), plot_ancestors = TRUE, roots = roots, ...)
+  plt2 = plotOntoTree(ont = ont, onts = all, ont_query = names(getOntologyId(adatas[[2]]$obs[[anno_col]], ont = ont)), plot_ancestors = TRUE, roots = roots, ...)
+
+  return(list(adata1 = plt1, adata2 = plt2))
+
+}
+
+
+
+
+
