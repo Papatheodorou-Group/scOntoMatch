@@ -2,10 +2,9 @@
 % Please edit documentation in R/functions.R
 \name{getOntoMapping}
 \alias{getOntoMapping}
-\alias{get.onto.mapping}
 \title{match ontology terms by direct mapping and mapping descendants to ancestors}
 \usage{
-get.onto.mapping(ont, onts1, onts2)
+getOntoMapping(ont, onts1, onts2)
 }
 \arguments{
 \item{ont}{the ontology object from get_OBO}

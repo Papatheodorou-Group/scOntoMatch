@@ -2,11 +2,10 @@
 % Please edit documentation in R/functions.R
 \name{ontoMatch}
 \alias{ontoMatch}
-\alias{onto.match}
 \title{Core function of scOntoMatch
 Match the ontology annotation of several adata files}
 \usage{
-onto.match(
+ontoMatch(
   adata1,
   adata2,
   anno_col = "authors_cell_type_-_ontology_labels",

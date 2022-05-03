@@ -2,10 +2,9 @@
 % Please edit documentation in R/functions.R
 \name{plotOntoTree}
 \alias{plotOntoTree}
-\alias{plot.onto.tree}
 \title{Plot a tree representation of ontology terms}
 \usage{
-\method{plot}{onto.tree}(ont, onts, plot_ancestors = TRUE, ont_query, ...)
+plotOntoTree(ont, onts, plot_ancestors = TRUE, ont_query = NULL, ...)
 }
 \arguments{
 \item{ont}{ontology object}

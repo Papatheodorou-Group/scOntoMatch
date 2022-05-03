@@ -7,7 +7,7 @@
 #' @importFrom ontologyIndex get_ancestors
 #' @export
 
-get.onto.mapping <- function(ont, onts1, onts2){
+getOntoMapping <- function(ont, onts1, onts2){
 
   intersection <- intersect(onts1, onts2)
   mappings = c()
@@ -60,7 +60,7 @@ get.onto.mapping <- function(ont, onts1, onts2){
 #' @export
 
 
-onto.match <- function(adata1, adata2, anno_col='authors_cell_type_-_ontology_labels', onto_id_col='authors_cell_type_-_ontology_labels_ontology', obo_file, propagate_relationships = c('is_a', 'part_of')) {
+ontoMatch <- function(adata1, adata2, anno_col='authors_cell_type_-_ontology_labels', onto_id_col='authors_cell_type_-_ontology_labels_ontology', obo_file, propagate_relationships = c('is_a', 'part_of')) {
   message("start matching the ontology annotation")
   ont <- ontologyIndex::get_OBO(obo_file, propagate_relationships = propagate_relationships)
   ad_one = anndata::read_h5ad(adata1)
@@ -136,7 +136,7 @@ fill_query = function(all, query) {
 #' @importFrom ontologyIndex get_ancestors
 #' @export
 
-plot.onto.tree <- function(ont, onts, plot_ancestors=TRUE, ont_query=NULL, ...){
+plotOntoTree <- function(ont, onts, plot_ancestors=TRUE, ont_query=NULL, ...){
 
   if(plot_ancestors){
 
