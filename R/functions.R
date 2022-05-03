@@ -167,7 +167,8 @@ ontoMatchMinimal <- function(adatas, ont ){
   # setdiff(new_all, minimal_set(ont, new_all)) contains intermediate terms
   # minimal_set(ont, setdiff(new_all, minimal_set(ont, new_all))) contains leaf terms among intermediate terms to avoid over-merging
   # that gives the removed_terms for us to match to its ancestor in intermediate terms
-  removed_terms = minimal_set(ont, setdiff(new_all, minimal_set(ont, new_all)))
+  removed_terms_all = setdiff(new_all, minimal_set(ont, new_all))
+  removed_terms = setdiff(removed_terms_all, minimal_set(ont, removed_terms_all))
 
   new_terms_one = names(getOntologyId(adatas[[1]]$obs[['cell_type_mapped_ontology']], ont = ont))
   new_terms_two = names(getOntologyId(adatas[[2]]$obs[['cell_type_mapped_ontology']], ont = ont))

@@ -1,0 +1,155 @@
+---
+title: "scOntoMatch_vignette"
+author: "Yuyao Song"
+date: "03/05/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dpi=300)
+```
+
+
+
+## Installation
+
+```{r}
+
+## install from source
+# install.packages("devtools")
+library(devtools)
+devtools::install_github("YY-SONG0718/scOntoMatch")
+library(scOntoMatch)
+library(ontologyIndex)
+
+```
+
+## Load data
+
+Use the smartseq-2 lung dataset from Tabula Muris and Tabula Sapiens as example
+
+```{r}
+adata1 = '../example_data/TM_Lung_smartseq2_raw.h5ad'
+adata2 = '../example_data/TS_Lung_smartseq2_decontX.h5ad'
+
+
+anno_col = 'cell_ontology_class'
+onto_id_col = 'cell_ontology_id'
+
+obo_file = '../example_data/cl-basic.obo'
+propagate_relationships = c('is_a', 'part_of')
+
+```
+
+
+## Match ontology
+
+### ontoMatch
+The core action of `ontoMatch` is to map descendant terms to existing ancestor terms in the other dataset for both datasets
+
+```{r}
+
+adatas = scOntoMatch::ontoMatch(adata1 = adata1, adata2 = adata2, anno_col = anno_col, onto_id_col = onto_id_col, obo_file = obo_file, propagate_relationships = propagate_relationships)
+
+```
+```{r}
+adatas
+
+```
+### getOntologyId and getOntologyName
+
+```{r}
+ont <- ontologyIndex::get_OBO(obo_file, propagate_relationships = c('is_a', 'part_of'))
+
+scOntoMatch::getOntologyName(adatas[[1]]$obs[[onto_id_col]], ont = ont)
+
+```
+
+```{r}
+
+scOntoMatch::getOntologyId(adatas[[2]]$obs[[anno_col]], ont = ont)
+
+```
+
+## Plotting ontology tree
+### Ontology tree for individual datasets
+```{r}
+
+## before mapping
+
+scOntoMatch::plotOntoTree(ont = ont, 
+                          onts = names(getOntologyId(adatas[[1]]$obs[['cell_ontology_class']], ont = ont)), 
+                          ont_query = names(getOntologyId(adatas[[1]]$obs[['cell_ontology_class']], ont = ont)),
+                          plot_ancestors = TRUE,  roots = 'CL:0000548',
+                          fontsize=25)
+```
+```{r}
+
+scOntoMatch::plotOntoTree(ont = ont, 
+                          onts = names(getOntologyId(adatas[[2]]$obs[['cell_ontology_class']], ont = ont)), 
+                          ont_query = names(getOntologyId(adatas[[2]]$obs[['cell_ontology_class']], ont = ont)),
+                          plot_ancestors = TRUE,  roots = 'CL:0000548',
+                          fontsize=25)
+```
+```{r}
+## after mapping
+scOntoMatch::plotOntoTree(ont = ont, 
+                          onts = names(getOntologyId(adatas[[1]]$obs[['cell_type_mapped_ontology']], ont = ont)), 
+                          ont_query = names(getOntologyId(adatas[[1]]$obs[['cell_type_mapped_ontology']], ont = ont)),
+                          plot_ancestors = TRUE,  roots = 'CL:0000548',
+                          fontsize=25)
+
+```
+```{r}
+
+scOntoMatch::plotOntoTree(ont = ont, 
+                          onts = names(getOntologyId(adatas[[2]]$obs[['cell_type_mapped_ontology']], ont = ont)), 
+                          ont_query = names(getOntologyId(adatas[[2]]$obs[['cell_type_mapped_ontology']], ont = ont)),
+                          plot_ancestors = TRUE,  roots = 'CL:0000548',
+                          fontsize=25)
+```
+
+
+### Plot a unified ontology tree using both datasets
+```{r}
+
+plts = scOntoMatch::plotMatchedOntoTree(ont = ont, 
+                                 adatas = adatas,
+                                 anno_col = 'cell_type_mapped_ontology', 
+                                 roots = 'CL:0000548', fontsize=25)
+```
+```{r}
+plts$adata1
+```
+```{r}
+plts$adata2
+```
+
+
+## Match minimal ontology
+
+We can see that in the first dataset, monocyte and its descendant term classical monocyte both exists, similarly with lung endothelial cell and epithelial cell of lung. This means the granularity of annotation is not unified within dataset 1.
+
+While match to dataset2, this can create confusion: because we have matched 
+
+In this case, we use `ontoMatchMinimal` to remove redundant terms. But we do not want all children terms to match to their broad ancestor terms as that lost too much information. So there is a trick that you could find more detail in the function documentation.
+
+```{r}
+
+adatas_minimal <- ontoMatchMinimal(adatas, ont)
+
+```
+```{r}
+plts_minimal = scOntoMatch::plotMatchedOntoTree(ont = ont, 
+                                 adatas = adatas_minimal,
+                                 anno_col = 'cell_type_mapped_ontology_base', 
+                                 roots = 'CL:0000548', fontsize=25)
+
+```
+```{r}
+plts_minimal$adata1
+```
+```{r}
+plts_minimal$adata2
+```
+
