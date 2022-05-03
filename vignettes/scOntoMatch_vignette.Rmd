@@ -130,7 +130,7 @@ plts$adata2
 
 We can see that in the first dataset, monocyte and its descendant term classical monocyte both exists, similarly with lung endothelial cell and epithelial cell of lung. This means the granularity of annotation is not unified within dataset 1.
 
-While match to dataset2, this can create confusion: because we have matched 
+While match to dataset2, this can create confusion: because we have matched many descendant terms to monocyte and epithelial cell of lung
 
 In this case, we use `ontoMatchMinimal` to remove redundant terms. But we do not want all children terms to match to their broad ancestor terms as that lost too much information. So there is a trick that you could find more detail in the function documentation.
 

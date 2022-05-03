@@ -13,10 +13,13 @@ getOntoMapping <- function(ont, onts1, onts2){
   intersection <- intersect(onts1, onts2)
   mappings = c()
   mappings[intersection] = intersection
-  message(paste0("intersection terms: ", intersection))
+  message(paste0(" intersection terms: ", intersection))
 
   onts1 <- onts1[! onts1 %in% intersection]
   onts2 <- onts2[! onts2 %in% intersection]
+
+  onts1 = minimal_set(ont, onts1)
+  onts2 = minimal_set(ont, onts2)
 
   ancestors_onts_1 <- lapply(onts1, function(x) ontologyIndex::get_ancestors(ont, x))
   ancestors_onts_2 <- lapply(onts2, function(x) ontologyIndex::get_ancestors(ont, x))
@@ -82,17 +85,18 @@ ontoMatch <- function(adata1, adata2, anno_col='authors_cell_type_-_ontology_lab
 
   } else {
     message("translate annotation to ontology id")
-    onts1=names(ont$name[names(ont$id[ont$name %in% levels(factor(ad_one$obs[[anno_col]]))])])
-    onts2=names(ont$name[names(ont$id[ont$name %in% levels(factor(ad_two$obs[[anno_col]]))])])
+    onts1=names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(ad_one$obs[[anno_col]])))])])
+    onts2=names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(ad_two$obs[[anno_col]])))])])
     if(length(onts1) != length(levels(factor(ad_one$obs[[onto_id_col]])))) {
       message("warning: some cell type annotations do not have corresponding ontology id in adata 1, consider manual re-annotate")
-      message(paste(levels(factor(ad_one$obs[[anno_col]]))[!levels(factor(ad_one$obs[[anno_col]])) %in% ont$name], collapse = ', '))
+      message(paste(levels(factor(ad_one$obs[[anno_col]]))[!tolower(levels(factor(ad_one$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ', '))
     }
     if(length(onts2) != length(levels(factor(ad_two$obs[[onto_id_col]])))) {
       message("warning: some cell type annotations do not have corresponding ontology id in adata 2, consider manual re-annotate")
-      message(paste(levels(factor(ad_two$obs[[anno_col]]))[!levels(factor(ad_two$obs[[anno_col]])) %in% ont$name], collapse = ', '))
+      message(paste(levels(factor(ad_two$obs[[anno_col]]))[!tolower(levels(factor(ad_two$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ', '))
     }
   }
+
 
   mappings = getOntoMapping(ont = ont, onts1 = onts1, onts2 = onts2)
 
@@ -105,8 +109,8 @@ ontoMatch <- function(adata1, adata2, anno_col='authors_cell_type_-_ontology_lab
     fromName = ont$name[names(ont$id[ont$id == fromTerm])]
     toName = ont$name[names(ont$id[ont$id == toTerm])]
     message(paste("mapping from name: ", fromName, " to name: ", toName, sep = ""))
-    ad_one$obs[which(ad_one$obs[[anno_col]] == fromName), "cell_type_mapped_ontology"] <- toName
-    ad_two$obs[which(ad_two$obs[[anno_col]] == fromName), "cell_type_mapped_ontology"] <- toName
+    ad_one$obs[which(tolower(ad_one$obs[[anno_col]]) == tolower(fromName)), "cell_type_mapped_ontology"] <- toName
+    ad_two$obs[which(tolower(ad_two$obs[[anno_col]]) == tolower(fromName)), "cell_type_mapped_ontology"] <- toName
 
   }
 
