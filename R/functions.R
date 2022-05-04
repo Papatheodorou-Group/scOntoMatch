@@ -145,6 +145,7 @@ ontoMinimal <- function(adata, anno_col, onto_id_col, ont ){
 
 
 ontoMatch <- function(adata1, adata2, anno_col, onto_id_col, ont, ...) {
+
   message("start matching the ontology annotation")
   ad_one = adata1
   ad_two = adata2
