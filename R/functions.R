@@ -54,6 +54,81 @@ getOntoMapping <- function(ont, onts1, onts2){
 }
 
 
+#' match descendant terms to ancestor terms within a dataset
+#' @name getOntoMinimal
+#' @param ont the ontology object from get_OBO
+#' @param onts1 a character vector of ontology id
+#' @return a names list for ontology id mapping looks like ontology_id:ontology_id
+#' @importFrom ontologyIndex get_ancestors
+#' @export
+#'
+#'
+#'
+getOntoMinimal <- function(ont, onts){
+
+  ansc_to_desc = lapply(structure(onts, names=onts), function(x) onts[unlist(lapply(onts, function(y) x %in% get_ancestors(ont, y) & x != y))])
+  ansc_to_desc = ansc_to_desc[unlist(lapply(ansc_to_desc, function(x) length(x) > 0))]
+
+  desc_to_ansc = list()
+
+  for (ancestor in names(ansc_to_desc)){
+
+    desc_to_ansc[ansc_to_desc[[ancestor]]] <- ancestor
+
+  }
+
+  return(desc_to_ansc)
+
+}
+
+#' get the minimal ontology tree of a dataset by reducing descendant terms to ancestor terms
+#' return adata .obs[["cell_ontology_base"]] storing the reduced ontology annotation
+#' @name ontoMinimal
+#' @param adata the anndata object
+#' @param anno_col the cell ontology text annotation column name
+#' @param onto_id_col if also have ontology id column for direct mapping
+#' @return an anndata object with .obs[["cell_ontology_base"]]
+#' @importFrom ontologyIndex get_ancestors
+#' @export
+#'
+#'
+#'
+
+
+ontoMinimal <- function(adata, anno_col, onto_id_col, ont ){
+
+  if(!is.null(adata$obs[[onto_id_col]])) {
+    message("use existing ontology id")
+    onts1=names(ont$name[names(ont$id[ont$id %in% levels(factor(adata$obs[[onto_id_col]]))])])
+
+  } else {
+    message("translate annotation to ontology id")
+    onts1=names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(adata$obs[[anno_col]])))])])
+
+    if(length(onts1) != length(levels(factor(ad_one$obs[[onto_id_col]])))) {
+      message("warning: some cell type annotations do not have corresponding ontology id in adata, consider manual re-annotate")
+      message(paste(levels(factor(adata$obs[[anno_col]]))[!tolower(levels(factor(adata$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ', '))
+    }
+
+  }
+
+  desc_to_ansc = getOntoMinimal(ont = ont, onts = onts1)
+
+  adata$obs[["cell_ontology_base"]] = as.character(adata$obs[[anno_col]])
+
+  for (fromTerm in names(desc_to_ansc)){
+    toTerm <- desc_to_ansc[fromTerm]
+    fromName = ont$name[names(ont$id[ont$id == fromTerm])]
+    toName = ont$name[names(ont$id[ont$id == toTerm])]
+    message(paste("mapping from name: ", fromName, " to name: ", toName, sep = ""))
+    adata$obs[which(tolower(adata$obs[[anno_col]]) == tolower(fromName)), "cell_ontology_base"] <- toName
+  }
+  message(paste0("after matching to base level ontology, adata has cell types: ", paste(levels(factor(adata$obs[["cell_ontology_base"]])), collapse = ', ')))
+  return(adata)
+}
+
+
+
 
 #' Core function of scOntoMatch
 #' Match the ontology annotation of several adata files
@@ -232,7 +307,7 @@ fill_query = function(all, query) {
 #' @importFrom ontologyIndex get_ancestors intersection_with_descendants
 #' @export
 
-plotOntoTree <- function(ont, onts, plot_ancestors=TRUE, ont_query=NULL, roots = NULL, ...){
+plotOntoTree <- function(ont, onts, plot_ancestors=TRUE, ont_query=NULL, roots = c("CL:0000548"), ...){
 
   if(plot_ancestors){
 

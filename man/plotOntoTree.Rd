@@ -9,7 +9,7 @@ plotOntoTree(
   onts,
   plot_ancestors = TRUE,
   ont_query = NULL,
-  roots = NULL,
+  roots = c("CL:0000548"),
   ...
 )
 }
