@@ -5,28 +5,18 @@
 \title{Core function of scOntoMatch
 Match the ontology annotation of several adata files}
 \usage{
-ontoMatch(
-  adata1,
-  adata2,
-  anno_col = "authors_cell_type_-_ontology_labels",
-  onto_id_col = "authors_cell_type_-_ontology_labels_ontology",
-  obo_file,
-  propagate_relationships = c("is_a", "part_of"),
-  ...
-)
+ontoMatch(adata1, adata2, anno_col, onto_id_col, ont, ...)
 }
 \arguments{
-\item{adata1}{one anndata file path}
+\item{adata1}{one anndata object}
 
-\item{adata2}{the other anndata file path}
+\item{adata2}{the other anndata object}
 
 \item{anno_col}{the cell ontology text annotation column name}
 
 \item{onto_id_col}{if also have ontology id column for direct mapping}
 
-\item{obo_file}{obo file path}
-
-\item{propagate_relationships}{relationships for reading in obo file}
+\item{ont}{ontology file loaded via get_OBO}
 }
 \value{
 a list of adata files with annotation ontology mapped to each-other in obs[['cell_type_mapped_ontology']]

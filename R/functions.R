@@ -106,7 +106,7 @@ ontoMinimal <- function(adata, anno_col, onto_id_col, ont ){
     onts1=names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(adata$obs[[anno_col]])))])])
 
     if(length(onts1) != length(levels(factor(ad_one$obs[[onto_id_col]])))) {
-      message("warning: some cell type annotations do not have corresponding ontology id in adata, consider manual re-annotate")
+      message("warning: some cell type annotations do not have corresponding ontology id in adata, consider manual re-annotate: ")
       message(paste(levels(factor(adata$obs[[anno_col]]))[!tolower(levels(factor(adata$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ', '))
     }
 
@@ -133,23 +133,21 @@ ontoMinimal <- function(adata, anno_col, onto_id_col, ont ){
 #' Core function of scOntoMatch
 #' Match the ontology annotation of several adata files
 #' @name ontoMatch
-#' @param adata1 one anndata file path
-#' @param adata2 the other anndata file path
+#' @param adata1 one anndata object
+#' @param adata2 the other anndata object
 #' @param anno_col the cell ontology text annotation column name
 #' @param onto_id_col if also have ontology id column for direct mapping
-#' @param obo_file obo file path
-#' @param propagate_relationships relationships for reading in obo file
+#' @param ont ontology file loaded via get_OBO
 #' @return a list of adata files with annotation ontology mapped to each-other in obs[['cell_type_mapped_ontology']]
 #' @importFrom ontologyIndex get_OBO
 #' @importFrom anndata read_h5ad
 #' @export
 
 
-ontoMatch <- function(adata1, adata2, anno_col='authors_cell_type_-_ontology_labels', onto_id_col='authors_cell_type_-_ontology_labels_ontology', obo_file, propagate_relationships = c('is_a', 'part_of'), ...) {
+ontoMatch <- function(adata1, adata2, anno_col, onto_id_col, ont, ...) {
   message("start matching the ontology annotation")
-  ont <- ontologyIndex::get_OBO(obo_file, propagate_relationships = propagate_relationships, ...)
-  ad_one = anndata::read_h5ad(adata1)
-  ad_two = anndata::read_h5ad(adata2)
+  ad_one = adata1
+  ad_two = adata2
   message(paste0("adata1 has cell types: ", paste(levels(factor(ad_one$obs[[anno_col]])), collapse = ', ')))
   message(paste0("adata2 has cell types: ", paste(levels(factor(ad_two$obs[[anno_col]])), collapse = ', ')))
 
@@ -163,11 +161,11 @@ ontoMatch <- function(adata1, adata2, anno_col='authors_cell_type_-_ontology_lab
     onts1=names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(ad_one$obs[[anno_col]])))])])
     onts2=names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(ad_two$obs[[anno_col]])))])])
     if(length(onts1) != length(levels(factor(ad_one$obs[[onto_id_col]])))) {
-      message("warning: some cell type annotations do not have corresponding ontology id in adata 1, consider manual re-annotate")
+      message("warning: some cell type annotations do not have corresponding ontology id in adata 1, consider manual re-annotate: ")
       message(paste(levels(factor(ad_one$obs[[anno_col]]))[!tolower(levels(factor(ad_one$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ', '))
     }
     if(length(onts2) != length(levels(factor(ad_two$obs[[onto_id_col]])))) {
-      message("warning: some cell type annotations do not have corresponding ontology id in adata 2, consider manual re-annotate")
+      message("warning: some cell type annotations do not have corresponding ontology id in adata 2, consider manual re-annotate: ")
       message(paste(levels(factor(ad_two$obs[[anno_col]]))[!tolower(levels(factor(ad_two$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ', '))
     }
   }
@@ -352,7 +350,6 @@ plotMatchedOntoTree <- function(adatas, ont, anno_col, roots = c("CL:0000548"), 
   return(list(adata1 = plt1, adata2 = plt2))
 
 }
-
 
 
 
