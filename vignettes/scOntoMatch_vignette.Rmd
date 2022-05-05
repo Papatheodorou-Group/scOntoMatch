@@ -44,7 +44,8 @@ ont <- ontologyIndex::get_OBO(obo_file, propagate_relationships = propagate_rela
 
 
 ## Match ontology
-### First trim the ontology tree per dataset
+
+### Trim the ontology tree per dataset
 
 Merging descendant terms to existing ancestor terms in the dataset to get a minimum ontology representation
 ```{r}
@@ -79,47 +80,63 @@ Now we can trim again
 ad_two_minimal = ontoMinimal(adata = ad_two, anno_col = anno_col, onto_id_col = onto_id_col, ont = ont)
 
 ```
-
-### ontoMatch
-The core action of `ontoMatch` is to map descendant terms in one dataset to existing ancestor terms in the other dataset reciprocally
-
-```{r}
-
-## perform ontoMatch on the trimmed ontology
-
-anno_col_minimal = "cell_ontology_base"
-
-adatas = ontoMatch(adata1 = ad_minimal, adata2 = ad_two_minimal, anno_col = anno_col_minimal, onto_id_col = onto_id_col, ont = ont)
-
-```
-```{r}
-adatas
-
-```
-
-## Plotting ontology tree
 ### Ontology tree for individual dataset
 before trimming
 ```{r}
 
 
 plotOntoTree(ont = ont, 
-                          onts = names(getOntologyId(adatas[[1]]$obs[['cell_ontology_class']], ont = ont)), 
-                          ont_query = names(getOntologyId(adatas[[1]]$obs[['cell_ontology_class']], ont = ont)),
+                          onts = names(getOntologyId(ad_minimal$obs[['cell_ontology_class']], ont = ont)), 
+                          ont_query = names(getOntologyId(ad_minimal$obs[['cell_ontology_class']], ont = ont)),
                           plot_ancestors = TRUE,  roots = 'CL:0000548',
                           fontsize=25)
 ```
+
+```{r}
+
+
+plotOntoTree(ont = ont, 
+                          onts = names(getOntologyId(ad_two_minimal$obs[['cell_ontology_class']], ont = ont)), 
+                          ont_query = names(getOntologyId(ad_two_minimal$obs[['cell_ontology_class']], ont = ont)),
+                          plot_ancestors = TRUE,  roots = 'CL:0000548',
+                          fontsize=25)
+```
+
+
 after trimming
 ```{r}
 
 plotOntoTree(ont = ont, 
-                          onts = names(getOntologyId(adatas[[1]]$obs[['cell_ontology_base']], ont = ont)), 
-                          ont_query = names(getOntologyId(adatas[[1]]$obs[['cell_ontology_base']], ont = ont)),
+                          onts = names(getOntologyId(ad_minimal$obs[['cell_ontology_base']], ont = ont)), 
+                          ont_query = names(getOntologyId(ad_minimal$obs[['cell_ontology_base']], ont = ont)),
                           plot_ancestors = TRUE,  roots = 'CL:0000548',
                           fontsize=25)
 ```
 
-### Plot a unified ontology tree using both datasets after matching
+```{r}
+
+plotOntoTree(ont = ont, 
+                          onts = names(getOntologyId(ad_two_minimal$obs[['cell_ontology_base']], ont = ont)), 
+                          ont_query = names(getOntologyId(ad_two_minimal$obs[['cell_ontology_base']], ont = ont)),
+                          plot_ancestors = TRUE,  roots = 'CL:0000548',
+                          fontsize=25)
+```
+
+
+### ontoMatch
+The core action of `ontoMatch` is to map descendant terms in one dataset to existing ancestor terms in the other dataset reciprocally
+
+```{r}
+
+## perform ontoMatch on the original tree
+
+adatas = ontoMatch(adata1 = ad_one, adata2 = ad_two, anno_col = 'cell_ontology_class', onto_id_col = onto_id_col, ont = ont)
+levels(factor(adatas[[1]]$obs$cell_type_mapped_ontology))
+```
+```{r}
+adatas
+
+```
 ```{r}
 
 plts = plotMatchedOntoTree(ont = ont, 
@@ -134,6 +151,33 @@ plts$adata1
 plts$adata2
 ```
 
+### perform ontoMatch on the trimmed ontology
+
+```{r}
+
+anno_col_minimal = "cell_ontology_base"
+
+adatas_minimal = ontoMatch(adata1 = ad_minimal, adata2 = ad_two_minimal, anno_col = anno_col_minimal, onto_id_col = onto_id_col, ont = ont)
+
+```
+```{r}
+adatas_minimal
+
+```
+
+```{r}
+
+plts_minimal = plotMatchedOntoTree(ont = ont, 
+                                 adatas = adatas_minimal,
+                                 anno_col = 'cell_type_mapped_ontology', 
+                                 roots = 'CL:0000548', fontsize=25)
+```
+```{r}
+plts_minimal$adata1
+```
+```{r}
+plts_minimal$adata2
+```
 
 ## Utility functions
 

@@ -161,11 +161,11 @@ ontoMatch <- function(adata1, adata2, anno_col, onto_id_col, ont, ...) {
     message("translate annotation to ontology id")
     onts1=names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(ad_one$obs[[anno_col]])))])])
     onts2=names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(ad_two$obs[[anno_col]])))])])
-    if(length(onts1) != length(levels(factor(ad_one$obs[[onto_id_col]])))) {
+    if(length(onts1) != length(levels(factor(ad_one$obs[[anno_col]])))) {
       message("warning: some cell type annotations do not have corresponding ontology id in adata 1, consider manual re-annotate: ")
       message(paste(levels(factor(ad_one$obs[[anno_col]]))[!tolower(levels(factor(ad_one$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ', '))
     }
-    if(length(onts2) != length(levels(factor(ad_two$obs[[onto_id_col]])))) {
+    if(length(onts2) != length(levels(factor(ad_two$obs[[anno_col]])))) {
       message("warning: some cell type annotations do not have corresponding ontology id in adata 2, consider manual re-annotate: ")
       message(paste(levels(factor(ad_two$obs[[anno_col]]))[!tolower(levels(factor(ad_two$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ', '))
     }
