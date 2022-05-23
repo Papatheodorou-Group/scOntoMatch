@@ -6,6 +6,7 @@ output: rmarkdown::html_vignette
 vignette: >
   %\VignetteEngine{knitr::knitr}
   %\VignetteIndexEntry{scOntoMatch_vignette}
+  % \VignetteDepends{devtools}
   %\usepackage[UTF-8]{inputenc}
 
 ---
@@ -23,7 +24,9 @@ knitr::opts_chunk$set(echo = TRUE, dpi=300)
 ## install from source
 # install.packages("devtools")
 library(devtools)
-install_github("YY-SONG0718/scOntoMatch")
+
+devtools::install_github("YY-SONG0718/scOntoMatch")
+
 library(scOntoMatch)
 library(ontologyIndex)
 ```
