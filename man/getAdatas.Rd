@@ -4,12 +4,12 @@
 \alias{getAdatas}
 \title{read in anndata files as a named list of anndata object}
 \usage{
-getAdatas(metadata, sep = "\\t")
+getAdatas(metadata, sep)
 }
 \arguments{
 \item{metadata}{a metadaat file indicating name, path to adata file}
 
-\item{sep}{sep of the metadata file, default "\t"}
+\item{sep}{sep of the metadata file}
 }
 \description{
 read in anndata files as a named list of anndata object

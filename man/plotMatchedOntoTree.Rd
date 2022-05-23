@@ -23,6 +23,8 @@ plotMatchedOntoTree(
 \item{onto_id_col}{if also have ontology id column for direct mapping}
 
 \item{roots}{root ontology in tree to plot, default "animal cells" in cell ontology}
+
+\item{...}{additional parameters for ontologyPlot::onto_plot}
 }
 \value{
 a lit of matched ontology tree plot

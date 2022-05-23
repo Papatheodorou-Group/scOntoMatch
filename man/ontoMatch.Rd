@@ -5,7 +5,7 @@
 \title{Core function of scOntoMatch
 Match the ontology annotation of several adata files}
 \usage{
-ontoMatch(adata1, adata2, anno_col, onto_id_col, ont, ...)
+ontoMatch(adata1, adata2, anno_col, onto_id_col, ont)
 }
 \arguments{
 \item{adata1}{one anndata object}

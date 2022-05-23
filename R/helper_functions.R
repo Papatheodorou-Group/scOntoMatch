@@ -2,12 +2,12 @@
 #' read in anndata files as a named list of anndata object
 #' @name getAdatas
 #' @param metadata a metadaat file indicating name, path to adata file
-#' @param sep sep of the metadata file, default "\t"
+#' @param sep sep of the metadata file
 #' @importFrom anndata read_h5ad
 #' @importFrom utils read.table
 #' @export
 #'
-getAdatas <- function(metadata, sep = "\t") {
+getAdatas <- function(metadata, sep ) {
   metadata <- read.table(metadata, sep = sep, col.names = c("name", "path"))
   adatas <- list()
   for (i in seq(1, nrow(metadata))) {

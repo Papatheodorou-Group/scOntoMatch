@@ -230,7 +230,7 @@ getOntoMultiMapping <- function(ont, onts) {
 #' @export
 
 
-ontoMatch <- function(adata1, adata2, anno_col, onto_id_col, ont, ...) {
+ontoMatch <- function(adata1, adata2, anno_col, onto_id_col, ont) {
   message("start matching the ontology annotation")
   ad_one <- adata1
   ad_two <- adata2
@@ -287,7 +287,7 @@ ontoMatch <- function(adata1, adata2, anno_col, onto_id_col, ont, ...) {
 #' @return a list of adata objects with annotation ontology mapped to each-other in obs[['cell_ontology_mapped']]
 #' @export
 
-ontoMultiMatch <- function(adatas, anno_col, onto_id_col, ont, ...) {
+ontoMultiMatch <- function(adatas, anno_col, onto_id_col, ont) {
   onts <- ontoTranslate(adatas = adatas, ont = ont, onto_id_col = onto_id_col, anno_col = anno_col)
   mappings <- getOntoMultiMapping(ont, onts = onts)
 
@@ -367,6 +367,7 @@ ontoMatchMinimal <- function(adatas, ont) {
 #' @param onts ontology ids to plot
 #' @param plot_ancestors if plot ancestors or not
 #' @param ont_query query ontology to highlight in the tree
+#' @param ... additional parameters for ontologyPlot::onto_plot
 #' @param roots root ontology in tree, default "animal cells" in cell ontology
 #' @return an ontology tree plot
 #' @importFrom ontologyPlot onto_plot
@@ -399,6 +400,7 @@ plotOntoTree <- function(ont, onts, plot_ancestors = TRUE, ont_query = NULL, roo
 #' @param adatas a list of adata files as the output of ontoMatch
 #' @param anno_col the cell ontology text annotation column name
 #' @param onto_id_col if also have ontology id column for direct mapping
+#' @param ... additional parameters for ontologyPlot::onto_plot
 #' @param roots root ontology in tree to plot, default "animal cells" in cell ontology
 #' @return a lit of matched ontology tree plot
 #' @importFrom ontologyPlot onto_plot
