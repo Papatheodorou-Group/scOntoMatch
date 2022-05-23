@@ -57,7 +57,7 @@ getOntoMapping <- function(ont, onts1, onts2){
 #' match descendant terms to ancestor terms within a dataset
 #' @name getOntoMinimal
 #' @param ont the ontology object from get_OBO
-#' @param onts1 a character vector of ontology id
+#' @param onts a character vector of ontology id
 #' @return a names list for ontology id mapping looks like ontology_id:ontology_id
 #' @importFrom ontologyIndex get_ancestors
 #' @export
@@ -81,6 +81,7 @@ getOntoMinimal <- function(ont, onts){
 
 }
 
+
 #' get the minimal ontology tree of a dataset by reducing descendant terms to ancestor terms
 #' return adata .obs[["cell_ontology_base"]] storing the reduced ontology annotation
 #' @name ontoMinimal
@@ -91,9 +92,6 @@ getOntoMinimal <- function(ont, onts){
 #' @importFrom ontologyIndex get_ancestors
 #' @export
 #'
-#'
-#'
-
 
 ontoMinimal <- function(adata, anno_col, onto_id_col, ont ){
 
@@ -128,6 +126,114 @@ ontoMinimal <- function(adata, anno_col, onto_id_col, ont ){
 }
 
 
+
+#' translate named list of adatas to named list of cell ontology ids per adata
+#' @name ontoTranslate
+#' @param adatas a named list of adatas object
+#' @param ont ontologyIndex object
+#' @param anno_col the cell ontology text annotation column name
+#' @param onto_id_col if also have ontology id column for direct mapping
+#' @return a named list of cell ontology ids
+#' @export
+#'
+
+ontoTranslate = function(adatas, ont, onto_id_col, anno_col){
+
+  onts = list()
+
+  if(all(unlist(lapply(adatas, function(x) !is.null(x$obs[[onto_id_col]]))))) {
+    message("use existing ontology id")
+    for(i in seq(1, length(adatas))){
+
+      onts[[names(adatas[i])]] =  names(ont$name[names(ont$id[ont$id %in% levels(factor(adatas[[i]]$obs[[onto_id_col]]))])])
+
+    }
+  } else {
+    message("translate annotation to ontology id")
+
+    for(i in seq(1, length(adatas))){
+      message(paste0("translating ", names(adatas[i])))
+      onts[[names(adatas[i])]] = names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(adatas[[i]]$obs[[anno_col]])))])])
+      check_ontology_translate(adata = adatas[[i]], onts = onts[[names(adatas[i])]], ont = ont, anno_col = anno_col)
+
+    }
+
+  }
+
+  return(onts)
+
+
+}
+
+
+#' get the minimal ontology tree of a list of adata objects by reducing descendant terms to ancestor terms
+#' return a named list of adata objects with $obs[["cell_ontology_base"]] storing the reduced ontology annotation
+#' @name ontoMultiMinimal
+#' @param adatas a named list of adata objects
+#' @param ont ontologyIndex object
+#' @param ont ontologyIndex object
+#' @param anno_col the cell ontology text annotation column name
+#' @param onto_id_col if also have ontology id column for direct mapping
+#' @return a named list of adata objects with $obs[["cell_ontology_base"]]
+#' @importFrom ontologyIndex get_ancestors
+#' @export
+#'
+#'
+#'
+
+ontoMultiMinimal <- function(adatas, ont, anno_col = 'cell_ontology_base', onto_id_col){
+
+  onts = ontoTranslate(adatas = adatas, ont = ont, onto_id_col = onto_id_col, anno_col = anno_col )
+
+  for(i in seq(1, length(adatas))){
+
+    desc_to_ansc = getOntoMinimal(ont = ont, onts = onts[[names(adatas[i])]])
+    adatas[[i]]$obs[["cell_ontology_base"]] = as.character(adatas[[i]]$obs[[anno_col]])
+    for (fromTerm in names(desc_to_ansc)){
+      toTerm <- desc_to_ansc[fromTerm]
+      fromName = ont$name[names(ont$id[ont$id == fromTerm])]
+      toName = ont$name[names(ont$id[ont$id == toTerm])]
+      message(paste("mapping from name: ", fromName, " to name: ", toName, sep = ""))
+      adatas[[i]]$obs[which(tolower(adatas[[i]]$obs[[anno_col]]) == tolower(fromName)), "cell_ontology_base"] <- toName
+    }
+    message(paste0("after matching to base level ontology, ", names(adatas[i]), " has cell types: "))
+    message(paste(as.character(levels(factor(adatas[[i]]$obs[["cell_ontology_base"]]))), sep = ", " ,collapse = ', '))
+
+  }
+
+  return(adatas)
+}
+
+
+
+#' Match descendants to ancestors in multiple ontology id lists
+#' @name getOntoMultiMapping
+#' @param onts named list of ontology ids
+#' @param ont ontologyIndex object
+#' @return a named character of mapping from:mapping to
+#' @importFrom purrr flatten_chr
+#' @export
+
+getOntoMultiMapping <- function(ont, onts){
+
+  ## direct matching
+  intersection <- Reduce(intersect, onts)
+  mappings = c()
+  mappings[intersection] = intersection
+  message(paste0("intersection terms: ", intersection))
+
+  onts_new = lapply(onts, FUN = function(x) x[!x %in% intersection])
+  onts_all = flatten_chr(onts_new)
+
+  desc_to_ansc = getOntoMinimal(ont = ont, onts = onts_all)
+  for(i in seq(1, length(desc_to_ansc))){
+
+    mappings[names(desc_to_ansc[i])] = desc_to_ansc[[i]]
+  }
+
+  return(mappings)
+
+}
 
 
 #' Core function of scOntoMatch
@@ -196,34 +302,39 @@ ontoMatch <- function(adata1, adata2, anno_col, onto_id_col, ont, ...) {
 
 }
 
-
-#' Get a names list of ontology and id by name
-#' @name getOntologyId
-#' @param onto_name character vector of ontology names
-#' @param ont ontology object
-#' @return a named list mapping ontology id and ontology name
+#' Core function of scOntoMatch
+#' Match the ontology annotation of multiple adata objects
+#' @name ontoMultiMatch
+#' @param adatas a namesd list of anndata objects to match
+#' @param ont ontologyIndex object
+#' @param anno_col the cell ontology text annotation column name
+#' @param onto_id_col if also have ontology id column for direct mapping
+#' @return a list of adata objects with annotation ontology mapped to each-other in obs[['cell_ontology_mapped']]
 #' @export
 
+ontoMultiMatch <- function(adatas, anno_col, onto_id_col, ont, ...) {
 
-getOntologyId <- function(onto_name, ont){
+  onts = ontoTranslate(adatas = adatas, ont = ont, onto_id_col = onto_id_col, anno_col = anno_col )
+  mappings = getOntoMultiMapping(ont, onts = onts)
 
-  return(ont$name[names(ont$id[ont$name %in% levels(factor(onto_name))])])
+  for(i in seq(1, length(adatas))){
+    message(paste0("processing ", names(adatas[i])))
+    adatas[[i]]$obs[["cell_ontology_mapped"]] = as.character(adatas[[i]]$obs[[anno_col]])
+    for (fromTerm in names(mappings)){
+      toTerm <- mappings[fromTerm]
+      fromName = ont$name[names(ont$id[ont$id == fromTerm])]
+      toName = ont$name[names(ont$id[ont$id == toTerm])]
+      message(paste("mapping from name: ", fromName, " to name: ", toName, sep = ""))
+      adatas[[i]]$obs[which(tolower(adatas[[i]]$obs[[anno_col]]) == tolower(fromName)), "cell_ontology_mapped"] <- toName
+    }
+    message(paste0("after matching across datasets, ", names(adatas[i]), " has cell types: "))
+    message(paste(as.character(levels(factor(adatas[[i]]$obs[["cell_ontology_mapped"]]))), sep = ", " ,collapse = ', '))
+
+  }
+
+  return(adatas)
 
 }
-
-#' Get a names list of ontology and id by id
-#' @name getOntologyName
-#' @param onto_id character vector of ontology ids
-#' @param ont ontology object
-#' @return a named list mapping ontology id and ontology name
-#' @export
-
-
-getOntologyName <- function(onto_id, ont){
-
-    return(ont$name[names(ont$id[ont$id %in% levels(factor(onto_id))])])
-}
-
 
 
 #' In a matched ontology tree there could be simultaneously ancestral terms and descendant terms within each dataset,
@@ -278,21 +389,6 @@ ontoMatchMinimal <- function(adatas, ont ){
 
 
 
-#' Helper function to fill queries in plotOntoTree
-fill_query = function(all, query) {
-
-  color = c()
-  for(term_now in all){
-
-    if(term_now %in% query) {
-      color = c(color, "mediumaquamarine")
-    } else {
-      color = c(color, 'mistyrose')
-    }
-  }
-  return(color)
-}
-
 
 #' Plot a tree representation of ontology terms
 #' @name plotOntoTree
@@ -337,18 +433,22 @@ plotOntoTree <- function(ont, onts, plot_ancestors=TRUE, ont_query=NULL, roots =
 #' @param roots root ontology in tree to plot, default "animal cells" in cell ontology
 #' @return a lit of matched ontology tree plot
 #' @importFrom ontologyPlot onto_plot
+#' @importFrom purrr flatten_chr
 #' @importFrom ontologyIndex get_ancestors intersection_with_descendants
 #' @export
 #'
 plotMatchedOntoTree <- function(adatas, ont, anno_col, roots = c("CL:0000548"),  ...){
 
-  all = unique(c(get_ancestors(ontology = ont, terms = names(getOntologyId(adatas[[2]]$obs[[anno_col]], ont = ont))),
-                 get_ancestors(ontology = ont, terms = names(getOntologyId(adatas[[1]]$obs[[anno_col]], ont = ont)))))
+  plots = list()
+  onts = suppressMessages(ontoTranslate(adatas_mapped, ont, onto_id_col, anno_col = anno_col))
+  all = unique(flatten_chr(onts))
 
-  plt1 = plotOntoTree(ont = ont, onts = all, ont_query = names(getOntologyId(adatas[[1]]$obs[[anno_col]], ont = ont)), plot_ancestors = TRUE, roots = roots, ...)
-  plt2 = plotOntoTree(ont = ont, onts = all, ont_query = names(getOntologyId(adatas[[2]]$obs[[anno_col]], ont = ont)), plot_ancestors = TRUE, roots = roots, ...)
+  for(i in seq(1, length(adatas))){
 
-  return(list(adata1 = plt1, adata2 = plt2))
+    plots[[names(adatas[i])]] = plotOntoTree(ont = ont, onts = all, ont_query = names(getOntologyId(adatas[[i]]$obs[[anno_col]], ont = ont)), plot_ancestors = TRUE, roots = roots, ...)
+  }
+
+  return(plots)
 
 }
 

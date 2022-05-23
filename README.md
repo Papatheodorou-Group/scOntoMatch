@@ -15,6 +15,7 @@ This package aims to match ontology labels between different datasets to make th
 install.packages("devtools")
 devtools::install_github("YY-SONG0718/scOntoMatch")
 library(scOntoMatch)
+library(ontologyIndex)
 ```
 
 ## Usage
@@ -27,18 +28,22 @@ First download the ontology `.obo` file from [the OBO foundry](https://obofoundr
 
 Refer to [vignette](https://github.com/YY-SONG0718/scOntoMatch/blob/main/vignettes/scOntoMatch_vignette.Rmd) for detailed usage.
 
+Get input ready
+```
+adatas = getAdatas(metadata = metadata, sep = "\t")
+ont = ontologyIndex::get_OBO(oboFile, propagate_relationships = c('is_a', 'part_of'), )
+```
+
 Trim ontology tree to remove redundant terms
 
 ```
-adata1 = ontoMinimal(ad1, anno_col, onto_id_col, ont)
-adata2 = ontoMinimal(ad2, anno_col, onto_id_col, ont)
-
+adatas_minimal = ontoMultiMinimal(adatas, ont = ont, anno_col = "cell_ontology_type", onto_id_col = "cell_ontology_id")
 ```
 
-Match ontology cross dataset by direct mapping and mapping descendants to ancestor terms. 
+Match ontology cross datasets by direct mapping and mapping descendants to ancestor terms. 
 
 ```
-adatas = ontoMatch(adata1, adata2, anno_col, onto_id_col, ont)
+adatas_matched = ontoMultiMatch(adatas_minimal, ont = ont, anno_col = "cell_ontology_base")
 
 ```
 
@@ -49,11 +54,11 @@ Plot a ontology tree per dataset
 ```
 plotOntoTree(ont, onts, plot_ancestors=TRUE, ont_query, fontsize = 20)
 ```
-Plot a matched ontology tree for both datasets
+Plot a matched ontology tree for all datasets
 
 ```
 # use 'animal cells' as root
-plts = plotMatchedOntoTree(ont = ont, adatas = adatas, anno_col = 'cell_type_mapped_ontology', roots = 'CL:0000548', fontsize=25)
+plts = plotMatchedOntoTree(ont = ont, adatas = adatas, anno_col = "cell_ontology_mapped", roots = 'CL:0000548', fontsize=25)
 ```                                 
 
 The [Single Cell Expression Atlas](https://www.ebi.ac.uk/gxa/sc/home) hosted at EBI provides uniformly analysed and annotated scRNA-Seq data across multiple species. 

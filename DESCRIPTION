@@ -1,6 +1,6 @@
 Package: scOntoMatch
 Type: Package
-Title: scOntoMatch unifies ontology annotation of pairs of scRNA-seq data to make them comparable across studies
+Title: scOntoMatch unifies ontology annotation of scRNA-seq datasets to make them comparable across studies
 Version: 0.1.0
 Authors@R: person("Yuyao", "Song", email = "ysong@ebi.ac.uk",
   role = c("aut", "cre"))

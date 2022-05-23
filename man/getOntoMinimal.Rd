@@ -9,7 +9,7 @@ getOntoMinimal(ont, onts)
 \arguments{
 \item{ont}{the ontology object from get_OBO}
 
-\item{onts1}{a character vector of ontology id}
+\item{onts}{a character vector of ontology id}
 }
 \value{
 a names list for ontology id mapping looks like ontology_id:ontology_id
