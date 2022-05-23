@@ -440,7 +440,7 @@ plotOntoTree <- function(ont, onts, plot_ancestors=TRUE, ont_query=NULL, roots =
 plotMatchedOntoTree <- function(adatas, ont, anno_col, roots = c("CL:0000548"),  ...){
 
   plots = list()
-  onts = suppressMessages(ontoTranslate(adatas_mapped, ont, onto_id_col, anno_col = anno_col))
+  onts = suppressMessages(ontoTranslate(adatas, ont, onto_id_col, anno_col = anno_col))
   all = unique(flatten_chr(onts))
 
   for(i in seq(1, length(adatas))){
