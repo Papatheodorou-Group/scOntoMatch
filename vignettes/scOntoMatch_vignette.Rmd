@@ -21,7 +21,6 @@ library(devtools)
 devtools::install_github("YY-SONG0718/scOntoMatch")
 library(scOntoMatch)
 library(ontologyIndex)
-library(anndata)
 ```
 
 ## Load data
@@ -44,11 +43,11 @@ ont <- ontologyIndex::get_OBO(obo_file, propagate_relationships = propagate_rela
 
 ### Trim the ontology tree per dataset
 
-Merging descendant terms to existing ancestor terms in the dataset to get a minimum ontology representation
+Merging descendant terms to existing ancestor terms in the datasets to get a minimum ontology representation
 ```{r}
 
 adatas = getAdatas(metadata = metadata, sep = "\t")
-
+adatas
 ```
 ```{r}
 adatas_minimal = scOntoMatch::ontoMultiMinimal(adatas = adatas, ont = ont, anno_col = anno_col, onto_id_col = onto_id_col)
@@ -56,14 +55,14 @@ adatas_minimal = scOntoMatch::ontoMultiMinimal(adatas = adatas, ont = ont, anno_
 
 We can see that some cell types in adata2 can not match to an ontology term. Consider manual re-annotate. Note that always check literature before manual curation.
 ```{r}
-ad_two$obs[[anno_col]] = as.character(ad_two$obs[[anno_col]])
+adatas$TS_lung$obs[[anno_col]] = as.character(adatas$TS_lung$obs[[anno_col]])
 
 ## nk cell can certainly be matched
-ad_two$obs[which(ad_two$obs[[anno_col]] == 'nk cell'), anno_col] = 'natural killer cell'
+adatas$TS_lung$obs[which(adatas$TS_lung$obs[[anno_col]] == 'nk cell'), anno_col] = 'natural killer cell'
 
 ## there are type 1 and type 2 alveolar fibroblast which both belongs to fibroblast of lung
 
-ad_two$obs[which(ad_two$obs[[anno_col]] == 'alveolar fibroblast'), anno_col] = 'fibroblast of lung'
+adatas$TS_lung$obs[which(adatas$TS_lung$obs[[anno_col]] == 'alveolar fibroblast'), anno_col] = 'fibroblast of lung'
 
 ## capillary aerocyte is a recently discovered new lung-specific cell type that is good to keep it
 ## Gillich, A., Zhang, F., Farmer, C.G. et al. Capillary cell-type specialization in the alveolus. Nature 586, 785–789 (2020). https://doi.org/10.1038/s41586-020-2822-7
@@ -72,8 +71,7 @@ ad_two$obs[which(ad_two$obs[[anno_col]] == 'alveolar fibroblast'), anno_col] = '
 
 Now we can trim again
 ```{r}
-ad_two_minimal = ontoMinimal(adata = ad_two, anno_col = anno_col, onto_id_col = onto_id_col, ont = ont)
-
+adatas_minimal = scOntoMatch::ontoMultiMinimal(adatas = adatas, ont = ont, anno_col = anno_col, onto_id_col = onto_id_col)
 ```
 ### Ontology tree for individual dataset
 before trimming
@@ -81,8 +79,8 @@ before trimming
 
 
 plotOntoTree(ont = ont, 
-                          onts = names(getOntologyId(ad_minimal$obs[['cell_ontology_class']], ont = ont)), 
-                          ont_query = names(getOntologyId(ad_minimal$obs[['cell_ontology_class']], ont = ont)),
+                          onts = names(getOntologyId(adatas$TM_lung$obs[['cell_ontology_class']], ont = ont)), 
+                          ont_query = names(getOntologyId(adatas$TM_lung$obs[['cell_ontology_class']], ont = ont)),
                           plot_ancestors = TRUE,  roots = 'CL:0000548',
                           fontsize=25)
 ```
@@ -91,8 +89,8 @@ plotOntoTree(ont = ont,
 
 
 plotOntoTree(ont = ont, 
-                          onts = names(getOntologyId(ad_two_minimal$obs[['cell_ontology_class']], ont = ont)), 
-                          ont_query = names(getOntologyId(ad_two_minimal$obs[['cell_ontology_class']], ont = ont)),
+                          onts = names(getOntologyId(adatas$TS_lung$obs[['cell_ontology_class']], ont = ont)), 
+                          ont_query = names(getOntologyId(adatas$TS_lung$obs[['cell_ontology_class']], ont = ont)),
                           plot_ancestors = TRUE,  roots = 'CL:0000548',
                           fontsize=25)
 ```
@@ -102,8 +100,8 @@ after trimming
 ```{r}
 
 plotOntoTree(ont = ont, 
-                          onts = names(getOntologyId(ad_minimal$obs[['cell_ontology_base']], ont = ont)), 
-                          ont_query = names(getOntologyId(ad_minimal$obs[['cell_ontology_base']], ont = ont)),
+                          onts = names(getOntologyId(adatas$TM_lung$obs[['cell_ontology_base']], ont = ont)), 
+                          ont_query = names(getOntologyId(adatas$TM_lung$obs[['cell_ontology_base']], ont = ont)),
                           plot_ancestors = TRUE,  roots = 'CL:0000548',
                           fontsize=25)
 ```
@@ -111,8 +109,8 @@ plotOntoTree(ont = ont,
 ```{r}
 
 plotOntoTree(ont = ont, 
-                          onts = names(getOntologyId(ad_two_minimal$obs[['cell_ontology_base']], ont = ont)), 
-                          ont_query = names(getOntologyId(ad_two_minimal$obs[['cell_ontology_base']], ont = ont)),
+                          onts = names(getOntologyId(adatas$TS_lung$obs[['cell_ontology_base']], ont = ont)), 
+                          ont_query = names(getOntologyId(adatas$TS_lung$obs[['cell_ontology_base']], ont = ont)),
                           plot_ancestors = TRUE,  roots = 'CL:0000548',
                           fontsize=25)
 ```
@@ -125,54 +123,27 @@ The core action of `ontoMatch` is to map descendant terms in one dataset to exis
 
 ## perform ontoMatch on the original tree
 
-adatas = ontoMatch(adata1 = ad_one, adata2 = ad_two, anno_col = 'cell_ontology_class', onto_id_col = onto_id_col, ont = ont)
-levels(factor(adatas[[1]]$obs$cell_type_mapped_ontology))
+adatas_matched = scOntoMatch::ontoMultiMatch(adatas = adatas_minimal, anno_col = 'cell_ontology_base', onto_id_col = onto_id_col, ont = ont)
 ```
 ```{r}
-adatas
+adatas_matched
 
 ```
 ```{r}
 
 plts = plotMatchedOntoTree(ont = ont, 
                                  adatas = adatas,
-                                 anno_col = 'cell_type_mapped_ontology', 
+                                 anno_col = 'cell_ontology_mapped', 
+                                 onto_id_col = onto_id_col,
                                  roots = 'CL:0000548', fontsize=25)
 ```
 ```{r}
-plts$adata1
+plts[[1]]
 ```
 ```{r}
-plts$adata2
+plts[[2]]
 ```
 
-### perform ontoMatch on the trimmed ontology
-
-```{r}
-
-anno_col_minimal = "cell_ontology_base"
-
-adatas_minimal = ontoMatch(adata1 = ad_minimal, adata2 = ad_two_minimal, anno_col = anno_col_minimal, onto_id_col = onto_id_col, ont = ont)
-
-```
-```{r}
-adatas_minimal
-
-```
-
-```{r}
-
-plts_minimal = plotMatchedOntoTree(ont = ont, 
-                                 adatas = adatas_minimal,
-                                 anno_col = 'cell_type_mapped_ontology', 
-                                 roots = 'CL:0000548', fontsize=25)
-```
-```{r}
-plts_minimal$adata1
-```
-```{r}
-plts_minimal$adata2
-```
 
 ## Utility functions
 

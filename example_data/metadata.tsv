@@ -1,2 +1,2 @@
 TM_lung	../example_data/TM_Lung_smartseq2_raw.h5ad
-TS_lung	../example_data/TS_Lung_smartseq2_decontX.h5ad
+TS_lung	../example_data/TS_Lung_smartseq2_raw.h5ad
