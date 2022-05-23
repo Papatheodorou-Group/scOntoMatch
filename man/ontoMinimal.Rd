@@ -5,10 +5,12 @@
 \title{get the minimal ontology tree of a dataset by reducing descendant terms to ancestor terms
 return adata .obs[["cell_ontology_base"]] storing the reduced ontology annotation}
 \usage{
-ontoMinimal(adata, anno_col, onto_id_col, ont)
+ontoMinimal(adata, ont, anno_col, onto_id_col)
 }
 \arguments{
 \item{adata}{the anndata object}
+
+\item{ont}{ontologyIndex object}
 
 \item{anno_col}{the cell ontology text annotation column name}
 

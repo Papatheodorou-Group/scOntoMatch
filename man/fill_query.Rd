@@ -2,10 +2,18 @@
 % Please edit documentation in R/helper_functions.R
 \name{fill_query}
 \alias{fill_query}
-\title{Helper function to fill queries in plotOntoTree}
+\title{Get a names list of ontology and id by id}
 \usage{
 fill_query(all, query)
 }
+\arguments{
+\item{all}{all ontology id to plot tree}
+
+\item{query}{query ontology id to fill}
+}
+\value{
+a color object to fill query in onto_plot
+}
 \description{
-Helper function to fill queries in plotOntoTree
+Get a names list of ontology and id by id
 }

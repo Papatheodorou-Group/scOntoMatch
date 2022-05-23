@@ -4,14 +4,23 @@
 \alias{plotMatchedOntoTree}
 \title{Plot a ontology tree with matched ontology from ontoMatch}
 \usage{
-plotMatchedOntoTree(adatas, ont, anno_col, roots = c("CL:0000548"), ...)
+plotMatchedOntoTree(
+  adatas,
+  ont,
+  anno_col,
+  onto_id_col,
+  roots = c("CL:0000548"),
+  ...
+)
 }
 \arguments{
 \item{adatas}{a list of adata files as the output of ontoMatch}
 
 \item{ont}{ontology object}
 
-\item{anno_col}{the cell ontology text annotation column name to plot, could be 'cell_type_mapped_ontology' or 'cell_type_mapped_ontology_base'}
+\item{anno_col}{the cell ontology text annotation column name}
+
+\item{onto_id_col}{if also have ontology id column for direct mapping}
 
 \item{roots}{root ontology in tree to plot, default "animal cells" in cell ontology}
 }

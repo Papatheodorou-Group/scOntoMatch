@@ -1,7 +1,7 @@
 ---
 title: "scOntoMatch_vignette"
 author: "Yuyao Song"
-date: "03/05/2022"
+date: "23/05/2022"
 output: html_document
 ---
 
@@ -29,10 +29,7 @@ library(anndata)
 Use the smartseq-2 lung dataset from Tabula Muris and Tabula Sapiens as example
 
 ```{r}
-adata1 = '../example_data/TM_Lung_smartseq2_raw.h5ad'
-adata2 = '../example_data/TS_Lung_smartseq2_decontX.h5ad'
-ad_one <- read_h5ad(adata1)
-ad_two <- read_h5ad(adata2)
+metadata = '../data/metadata.tsv'
 
 anno_col = 'cell_ontology_class'
 onto_id_col = 'cell_ontology_id'

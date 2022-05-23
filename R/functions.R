@@ -86,6 +86,7 @@ getOntoMinimal <- function(ont, onts){
 #' return adata .obs[["cell_ontology_base"]] storing the reduced ontology annotation
 #' @name ontoMinimal
 #' @param adata the anndata object
+#' @param ont ontologyIndex object
 #' @param anno_col the cell ontology text annotation column name
 #' @param onto_id_col if also have ontology id column for direct mapping
 #' @return an anndata object with .obs[["cell_ontology_base"]]
@@ -93,7 +94,7 @@ getOntoMinimal <- function(ont, onts){
 #' @export
 #'
 
-ontoMinimal <- function(adata, anno_col, onto_id_col, ont ){
+ontoMinimal <- function(adata, ont, anno_col, onto_id_col){
 
   if(!is.null(adata$obs[[onto_id_col]])) {
     message("use existing ontology id")
@@ -103,7 +104,7 @@ ontoMinimal <- function(adata, anno_col, onto_id_col, ont ){
     message("translate annotation to ontology id")
     onts1=names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(adata$obs[[anno_col]])))])])
 
-    if(length(onts1) != length(levels(factor(ad_one$obs[[onto_id_col]])))) {
+    if(length(onts1) != length(levels(factor(adata$obs[[onto_id_col]])))) {
       message("warning: some cell type annotations do not have corresponding ontology id in adata, consider manual re-annotate: ")
       message(paste(levels(factor(adata$obs[[anno_col]]))[!tolower(levels(factor(adata$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ', '))
     }
@@ -170,7 +171,6 @@ ontoTranslate = function(adatas, ont, onto_id_col, anno_col){
 #' return a named list of adata objects with $obs[["cell_ontology_base"]] storing the reduced ontology annotation
 #' @name ontoMultiMinimal
 #' @param adatas a named list of adata objects
-#' @param ont ontologyIndex object
 #' @param ont ontologyIndex object
 #' @param anno_col the cell ontology text annotation column name
 #' @param onto_id_col if also have ontology id column for direct mapping
@@ -429,7 +429,8 @@ plotOntoTree <- function(ont, onts, plot_ancestors=TRUE, ont_query=NULL, roots =
 #' @name plotMatchedOntoTree
 #' @param ont ontology object
 #' @param adatas a list of adata files as the output of ontoMatch
-#' @param anno_col the cell ontology text annotation column name to plot, could be 'cell_type_mapped_ontology' or 'cell_type_mapped_ontology_base'
+#' @param anno_col the cell ontology text annotation column name
+#' @param onto_id_col if also have ontology id column for direct mapping
 #' @param roots root ontology in tree to plot, default "animal cells" in cell ontology
 #' @return a lit of matched ontology tree plot
 #' @importFrom ontologyPlot onto_plot
@@ -437,7 +438,7 @@ plotOntoTree <- function(ont, onts, plot_ancestors=TRUE, ont_query=NULL, roots =
 #' @importFrom ontologyIndex get_ancestors intersection_with_descendants
 #' @export
 #'
-plotMatchedOntoTree <- function(adatas, ont, anno_col, roots = c("CL:0000548"),  ...){
+plotMatchedOntoTree <- function(adatas, ont, anno_col, onto_id_col, roots = c("CL:0000548"),  ...){
 
   plots = list()
   onts = suppressMessages(ontoTranslate(adatas, ont, onto_id_col, anno_col = anno_col))

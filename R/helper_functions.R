@@ -4,6 +4,7 @@
 #' @param metadata a metadaat file indicating name, path to adata file
 #' @param sep sep of the metadata file, default "\t"
 #' @importFrom anndata read_h5ad
+#' @importFrom utils read.table
 #' @export
 #'
 getAdatas = function(metadata, sep = "\t"){
@@ -69,7 +70,13 @@ getOntologyName <- function(onto_id, ont){
 }
 
 
-#' Helper function to fill queries in plotOntoTree
+#' Get a names list of ontology and id by id
+#' @name fill_query
+#' @param all all ontology id to plot tree
+#' @param query query ontology id to fill
+#' @return a color object to fill query in onto_plot
+#' @export
+
 fill_query = function(all, query) {
 
   color = c()
