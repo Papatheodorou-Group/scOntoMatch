@@ -6,7 +6,6 @@ output: rmarkdown::html_vignette
 vignette: >
   %\VignetteEngine{knitr::knitr}
   %\VignetteIndexEntry{scOntoMatch_vignette}
-  % \VignetteDepends{devtools}
   %\usepackage[UTF-8]{inputenc}
 
 ---
@@ -19,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE, dpi=300)
 
 ## Installation
 
-```{r}
+```{r install}
 
 ## install from source
 # install.packages("devtools")
@@ -35,7 +34,7 @@ library(ontologyIndex)
 
 Use the smartseq-2 lung dataset from Tabula Muris and Tabula Sapiens as example
 
-```{r}
+```{r load data}
 metadata = '../example_data/metadata.tsv'
 
 anno_col = 'cell_ontology_class'
@@ -52,17 +51,17 @@ ont <- ontologyIndex::get_OBO(obo_file, propagate_relationships = propagate_rela
 ### Trim the ontology tree per dataset
 
 Merging descendant terms to existing ancestor terms in the datasets to get a minimum ontology representation
-```{r}
+```{r load adata}
 
 adatas = getAdatas(metadata = metadata, sep = "\t")
 adatas
 ```
-```{r}
+```{r ontoMultiMinimal}
 adatas_minimal = scOntoMatch::ontoMultiMinimal(adatas = adatas, ont = ont, anno_col = anno_col, onto_id_col = onto_id_col)
 ```
 
 We can see that some cell types in adata2 can not match to an ontology term. Consider manual re-annotate. Note that always check literature before manual curation.
-```{r}
+```{r re-annotate}
 adatas$TS_lung$obs[[anno_col]] = as.character(adatas$TS_lung$obs[[anno_col]])
 
 ## nk cell can certainly be matched
@@ -78,12 +77,12 @@ adatas$TS_lung$obs[which(adatas$TS_lung$obs[[anno_col]] == 'alveolar fibroblast'
 ```
 
 Now we can trim again
-```{r}
+```{r ontoMultiMinimal_new}
 adatas_minimal = scOntoMatch::ontoMultiMinimal(adatas = adatas, ont = ont, anno_col = anno_col, onto_id_col = onto_id_col)
 ```
 ### Ontology tree for individual dataset
 before trimming
-```{r}
+```{r plotOntoTree}
 
 
 plotOntoTree(ont = ont, 
@@ -93,7 +92,7 @@ plotOntoTree(ont = ont,
                           fontsize=25)
 ```
 
-```{r}
+```{r plotOntoTree_two}
 
 
 plotOntoTree(ont = ont, 
@@ -105,7 +104,7 @@ plotOntoTree(ont = ont,
 
 
 after trimming
-```{r}
+```{r plotOntoTree_minimal}
 
 plotOntoTree(ont = ont, 
                           onts = names(getOntologyId(adatas$TM_lung$obs[['cell_ontology_base']], ont = ont)), 
@@ -114,7 +113,7 @@ plotOntoTree(ont = ont,
                           fontsize=25)
 ```
 
-```{r}
+```{r plotOntoTree_minimal_two}
 
 plotOntoTree(ont = ont, 
                           onts = names(getOntologyId(adatas$TS_lung$obs[['cell_ontology_base']], ont = ont)), 
@@ -127,7 +126,7 @@ plotOntoTree(ont = ont,
 ### ontoMatch
 The core action of `ontoMatch` is to map descendant terms in one dataset to existing ancestor terms in the other dataset reciprocally
 
-```{r}
+```{r ontoMultiMatch}
 
 ## perform ontoMatch on the original tree
 
@@ -137,7 +136,7 @@ adatas_matched = scOntoMatch::ontoMultiMatch(adatas = adatas_minimal, anno_col =
 adatas_matched
 
 ```
-```{r}
+```{r plotMatchedOntoTree}
 
 plts = plotMatchedOntoTree(ont = ont, 
                                  adatas = adatas,
@@ -148,7 +147,7 @@ plts = plotMatchedOntoTree(ont = ont,
 ```{r}
 plts[[1]]
 ```
-```{r}
+```{r plotMatchedOntoTree_two}
 plts[[2]]
 ```
 
@@ -157,19 +156,19 @@ plts[[2]]
 
 getOntologyId and getOntologyName
 
-```{r}
+```{r getOntologyName}
 ont <- ontologyIndex::get_OBO(obo_file, propagate_relationships = c('is_a', 'part_of'))
 
 getOntologyName(adatas[[1]]$obs[[onto_id_col]], ont = ont)
 
 ```
 
-```{r}
+```{r getOntologyId}
 
 getOntologyId(adatas[[2]]$obs[[anno_col]], ont = ont)
 
 ```
 
-```{r}
+```{r sessionInfo}
 sessionInfo()
 ```
