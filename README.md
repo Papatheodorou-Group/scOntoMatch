@@ -44,7 +44,6 @@ Match ontology cross datasets by direct mapping and mapping descendants to ances
 
 ```
 adatas_matched = ontoMultiMatch(adatas_minimal, ont = ont, anno_col = "cell_ontology_base")
-
 ```
 
 

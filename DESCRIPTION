@@ -5,7 +5,7 @@ Version: 0.1.0
 Authors@R: person("Yuyao", "Song", email = "ysong@ebi.ac.uk",
   role = c("aut", "cre"))
 Description: Large-scale single cell atlases often have curated annotations using a standard onology system. This package aims to match ontology labels between different datasets to make them comparable across studies. The core functionality is to match ontology by direct mapping and mapping descendants to ancestor terms. This package also provides convenient plotting functions to help comprehend the hierarchy of cell types in any single cell dataset. In the Single Cell Expression Atlas hosted at EBI, diverse datasets with curated ontology labels are all great inputs to this package.
-Imports: ontologyIndex, ontologyPlot, anndata
+Imports: ontologyIndex, ontologyPlot, anndata, purrr
 URL: 
 License: MIT
 Encoding: UTF-8
