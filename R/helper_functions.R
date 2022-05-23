@@ -7,13 +7,11 @@
 #' @importFrom utils read.table
 #' @export
 #'
-getAdatas = function(metadata, sep = "\t"){
-
-  metadata = read.table(metadata, sep = sep, col.names = c("name", "path"))
-  adatas = list()
-  for(i in seq(1, nrow(metadata))){
-
-    adatas[[metadata[i, 'name']]] = anndata::read_h5ad(metadata[i, 'path'])
+getAdatas <- function(metadata, sep = "\t") {
+  metadata <- read.table(metadata, sep = sep, col.names = c("name", "path"))
+  adatas <- list()
+  for (i in seq(1, nrow(metadata))) {
+    adatas[[metadata[i, "name"]]] <- anndata::read_h5ad(metadata[i, "path"])
   }
 
   return(adatas)
@@ -30,16 +28,16 @@ getAdatas = function(metadata, sep = "\t"){
 #'
 
 
-check_ontology_translate = function(adata, onts, ont, anno_col){
-
-  if(length(onts) != length(levels(factor(adata$obs[[anno_col]])))) {
+check_ontology_translate <- function(adata, onts, ont, anno_col) {
+  if (length(onts) != length(levels(factor(adata$obs[[anno_col]])))) {
     message("warning: some cell type annotations do not have corresponding ontology id, consider manual re-annotate")
-    message(paste(as.character(levels(factor(adata$obs[[anno_col]]))[!tolower(levels(factor(adata$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ', ')))
-  } else (
-    message("ontology annotation translate to id successful")
+    message(paste(as.character(levels(factor(adata$obs[[anno_col]]))[!tolower(levels(factor(adata$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ", ")))
+  } else {
+    (
+      message("ontology annotation translate to id successful")
 
-  )
-
+    )
+  }
 }
 
 #' Get a names list of ontology and id by name
@@ -50,10 +48,8 @@ check_ontology_translate = function(adata, onts, ont, anno_col){
 #' @export
 
 
-getOntologyId <- function(onto_name, ont){
-
+getOntologyId <- function(onto_name, ont) {
   return(ont$name[names(ont$id[ont$name %in% levels(factor(onto_name))])])
-
 }
 
 #' Get a names list of ontology and id by id
@@ -64,8 +60,7 @@ getOntologyId <- function(onto_name, ont){
 #' @export
 
 
-getOntologyName <- function(onto_id, ont){
-
+getOntologyName <- function(onto_id, ont) {
   return(ont$name[names(ont$id[ont$id %in% levels(factor(onto_id))])])
 }
 
@@ -77,15 +72,13 @@ getOntologyName <- function(onto_id, ont){
 #' @return a color object to fill query in onto_plot
 #' @export
 
-fill_query = function(all, query) {
-
-  color = c()
-  for(term_now in all){
-
-    if(term_now %in% query) {
-      color = c(color, "mediumaquamarine")
+fill_query <- function(all, query) {
+  color <- c()
+  for (term_now in all) {
+    if (term_now %in% query) {
+      color <- c(color, "mediumaquamarine")
     } else {
-      color = c(color, 'mistyrose')
+      color <- c(color, "mistyrose")
     }
   }
   return(color)
