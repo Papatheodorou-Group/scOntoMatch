@@ -29,7 +29,7 @@ library(anndata)
 Use the smartseq-2 lung dataset from Tabula Muris and Tabula Sapiens as example
 
 ```{r}
-metadata = '../data/metadata.tsv'
+metadata = '../example_data/metadata.tsv'
 
 anno_col = 'cell_ontology_class'
 onto_id_col = 'cell_ontology_id'
@@ -47,13 +47,11 @@ ont <- ontologyIndex::get_OBO(obo_file, propagate_relationships = propagate_rela
 Merging descendant terms to existing ancestor terms in the dataset to get a minimum ontology representation
 ```{r}
 
-ad_minimal = ontoMinimal(adata = ad_one, anno_col = anno_col, onto_id_col = onto_id_col, ont = ont)
+adatas = getAdatas(metadata = metadata, sep = "\t")
 
 ```
 ```{r}
-
-ad_two_minimal = ontoMinimal(adata = ad_two, anno_col = anno_col, onto_id_col = onto_id_col, ont = ont)
-
+adatas_minimal = scOntoMatch::ontoMultiMinimal(adatas = adatas, ont = ont, anno_col = anno_col, onto_id_col = onto_id_col)
 ```
 
 We can see that some cell types in adata2 can not match to an ontology term. Consider manual re-annotate. Note that always check literature before manual curation.
