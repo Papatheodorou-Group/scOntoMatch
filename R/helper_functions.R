@@ -31,7 +31,7 @@ getAdatas <- function(metadata, sep = "\t") {
 check_ontology_translate <- function(adata, onts, ont, anno_col) {
   if (length(onts) != length(levels(factor(adata$obs[[anno_col]])))) {
     message("warning: some cell type annotations do not have corresponding ontology id, consider manual re-annotate")
-    message(paste(as.character(levels(factor(adata$obs[[anno_col]]))[!tolower(levels(factor(adata$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ", "), sep = ", ", collapse = ", "))
+    message(paste(levels(factor(adata$obs[[anno_col]]))[!tolower(levels(factor(adata$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ", "))
   } else {
     (
       message("ontology annotation translate to id successful")
