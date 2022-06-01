@@ -10,9 +10,29 @@
 getAdatas <- function(metadata, sep ) {
   metadata <- read.table(metadata, sep = sep, col.names = c("name", "path"))
   adatas <- list()
-  for (i in seq(1, nrow(metadata))) {
+  n_iter <- nrow(metadata) # Number of iterations of the loop
+
+  # Initializes the progress bar
+  pb <- txtProgressBar(min = 0,      # Minimum value of the progress bar
+                       max = n_iter, # Maximum value of the progress bar
+                       style = 3,    # Progress bar style (also available style = 1 and style = 2)
+                       width = 50,   # Progress bar width. Defaults to getOption("width")
+                       char = "=") # Character used to create the bar
+  message("start loading adata objects")
+  for(i in 1:n_iter) {
+
+    #---------------------
+    # Code to be executed
+    #---------------------
+
     adatas[[metadata[i, "name"]]] <- anndata::read_h5ad(metadata[i, "path"])
+    #---------------------
+
+    # Sets the progress bar to the current state
+    setTxtProgressBar(pb, i)
   }
+
+  close(pb) # Close the connection
 
   return(adatas)
 }
@@ -31,7 +51,7 @@ getAdatas <- function(metadata, sep ) {
 check_ontology_translate <- function(adata, onts, ont, anno_col) {
   if (length(onts) != length(levels(factor(adata$obs[[anno_col]])))) {
     message("warning: some cell type annotations do not have corresponding ontology id, consider manual re-annotate")
-    message(paste(levels(factor(adata$obs[[anno_col]]))[!tolower(levels(factor(adata$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ", "))
+    message(paste(levels(factor(adata$obs[[anno_col]]))[!tolower(levels(factor(adata$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ", ", sep = ", "))
   } else {
     (
       message("ontology annotation translate to id successful")

@@ -1,0 +1,76 @@
+* using log directory ‘/Users/ysong/SOFTWARE/scOntoMatch/scOntoMatch/..Rcheck’
+* using R version 4.1.2 (2021-11-01)
+* using platform: x86_64-apple-darwin17.0 (64-bit)
+* using session charset: UTF-8
+* using option ‘--as-cran’
+* checking for file ‘./DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘scOntoMatch’ version ‘0.1.0’
+* package encoding: UTF-8
+* checking CRAN incoming feasibility ... WARNING
+Maintainer: ‘person("Yuyao", "Song", email = "ysong@ebi.ac.uk", role = c("aut", "cre"))’
+
+The maintainer field is invalid or specifies more than one person
+The display-name part of the maintainer field should be enclosed in ""
+
+New submission
+
+Author field should be Authors@R.  Current value is:
+  person("Yuyao", "Song", email = "ysong@ebi.ac.uk",
+    role = c("aut", "cre"))
+
+Package has a VignetteBuilder field but no prebuilt vignette index.
+
+The Title field starts with the package name.
+The Title field should be in title case. Current version is:
+‘scOntoMatch unifies ontology annotation of scRNA-seq datasets to make them comparable across studies’
+In title case that is:
+‘scOntoMatch Unifies Ontology Annotation of scRNA-Seq Datasets to Make Them Comparable Across Studies’
+
+The build time stamp is missing.
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  .DS_Store
+  .gitignore
+  ..Rcheck
+  .Rproj.user
+  .git
+These were most likely included in error. See section ‘Package
+structure’ in the ‘Writing R Extensions’ manual.
+
+CRAN-pack does not know about
+  .DS_Store
+  ..Rcheck
+  .git
+* checking for portable file names ... NOTE
+Found the following non-portable file paths:
+  scOntoMatch/.Rproj.user/shared/notebooks/21A4B4B6-scOntoMatch_vignette/1/C403C7A91A8B3F1C/chunks.json
+  scOntoMatch/.Rproj.user/shared/notebooks/21A4B4B6-scOntoMatch_vignette/1/s/cav3m23sb099b/000003.metadata
+  scOntoMatch/.Rproj.user/shared/notebooks/21A4B4B6-scOntoMatch_vignette/1/s/cav3m23sb099b/000003.snapshot
+  scOntoMatch/.Rproj.user/shared/notebooks/21A4B4B6-scOntoMatch_vignette/1/s/cdu3f35y3m97m/000003.metadata
+  scOntoMatch/.Rproj.user/shared/notebooks/21A4B4B6-scOntoMatch_vignette/1/s/cdu3f35y3m97m/000003.snapshot
+  scOntoMatch/.Rproj.user/shared/notebooks/21A4B4B6-scOntoMatch_vignette/1/s/coykj3j11cpae/000003.metadata
+  scOntoMatch/.Rproj.user/shared/notebooks/21A4B4B6-scOntoMatch_vignette/1/s/coykj3j11cpae/000003.snapshot
+  scOntoMatch/.Rproj.user/shared/notebooks/21A4B4B6-scOntoMatch_vignette/1/s/crfdvi048f4m9/000003.metadata
+  scOntoMatch/.Rproj.user/shared/notebooks/21A4B4B6-scOntoMatch_vignette/1/s/crfdvi048f4m9/000003.snapshot
+  scOntoMatch/.Rproj.user/shared/notebooks/21A4B4B6-scOntoMatch_vignette/1/s/csvnrrq41v53r/000003.metadata
+  scOntoMatch/.Rproj.user/shared/notebooks/21A4B4B6-scOntoMatch_vignette/1/s/csvnrrq41v53r/000003.snapshot
+  scOntoMatch/.Rproj.user/shared/notebooks/21A4B4B6-scOntoMatch_vignette/1/s/cwgaydlxn9wla/000003.metadata
+  scOntoMatch/.Rproj.user/shared/notebooks/21A4B4B6-scOntoMatch_vignette/1/s/cwgaydlxn9wla/000003.snapshot
+
+Tarballs are only required to store paths of up to 100 bytes and cannot
+store those of more than 256 bytes, with restrictions including to 100
+bytes for the final component.
+See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
+* checking for sufficient/correct file permissions ... OK
+* checking serialization versions ... OK
+* checking whether package ‘scOntoMatch’ can be installed ... ERROR
+Installation failed.
+See ‘/Users/ysong/SOFTWARE/scOntoMatch/scOntoMatch/..Rcheck/00install.out’ for details.
+* DONE
+Status: 1 ERROR, 1 WARNING, 2 NOTEs
