@@ -4,7 +4,7 @@
 #' @param metadata a metadaat file indicating name, path to adata file
 #' @param sep sep of the metadata file
 #' @importFrom anndata read_h5ad
-#' @importFrom utils read.table
+#' @importFrom utils read.table setTxtProgressBar txtProgressBar
 #' @export
 #'
 getAdatas <- function(metadata, sep ) {
