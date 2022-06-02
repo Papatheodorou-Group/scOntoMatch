@@ -1,11 +1,11 @@
 Package: scOntoMatch
 Type: Package
-Title: scOntoMatch unifies ontology annotation of scRNA-seq datasets to make them comparable across studies
+Title: Aligning Ontology Annotation Granularity Across scRNA-seq Datasets with scOntoMatch
 Version: 0.1.0
-Author@R: c(person("Yuyao", "Song", email = "ysong@ebi.ac.uk", role = c("aut", "cre")))
+Author@R: c(person("Yuyao", "Song", email = "ysong@ebi.ac.uk", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9738-9726")))
 Author: Yuyao Song [aut, cre]
 Maintainer: Yuyao Song  <ysong@ebi.ac.uk>
-Description: Large-scale single cell atlases often have curated annotations using a standard onology system. This package aims to match ontology labels between different datasets to make them comparable across studies. The core functionality is to match ontology by direct mapping and mapping descendants to ancestor terms. This package also provides convenient plotting functions to help comprehend the hierarchy of cell types in any single cell dataset. In the Single Cell Expression Atlas hosted at EBI, diverse datasets with curated ontology labels are all great inputs to this package.
+Description: Unequal granularity of cell type annotation makes it difficult to compare scRNA-seq datasets at scale. Leveraging the ontology system for defining cell type hierarchy, scOntoMatch aims to align cell type annotations to make them comparable across studies. The alignment involves two core steps: first is to trim the cell type tree within each dataset so each cell type does not have descendants, and then map cell type labels cross-studies by direct matching and mapping descendants to ancestors. Various functions for plotting cell type trees and manipulating ontology terms are also provided. In the Single Cell Expression Atlas hosted at EBI, a compendium of datasets with curated ontology labels are great inputs to this package.
 Imports: ontologyIndex, ontologyPlot, anndata, purrr
 URL: https://github.com/YY-SONG0718/scOntoMatch
 BugReports: https://github.com/YY-SONG0718/scOntoMatch/issues
