@@ -35,12 +35,12 @@ library(ontologyIndex)
 Use the smartseq-2 lung dataset from Tabula Muris and Tabula Sapiens as example
 
 ```{r load data}
-metadata = '../example_data/metadata.tsv'
+metadata = '../inst/extdata/metadata.tsv'
 
 anno_col = 'cell_ontology_class'
 onto_id_col = 'cell_ontology_id'
 
-obo_file = '../example_data/cl-basic.obo'
+obo_file = '../inst/extdata/cl-basic.obo'
 propagate_relationships = c('is_a', 'part_of')
 ont <- ontologyIndex::get_OBO(obo_file, propagate_relationships = propagate_relationships)
 ```
