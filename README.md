@@ -65,5 +65,5 @@ Datasets with curated ontology labels are all great inputs to this package. scRN
 Files that has extension `.project.h5ad` can be pass to `ontoMatch` with `anno_col = 'authors_cell_type_-_ontology_labels'`. 
 
 
-This package imports functions from [ontologyIndex](https://cran.r-project.org/web/packages/ontologyIndex/index.html), [ontologyPlot](https://cran.rstudio.com/web/packages/ontologyPlot/index.html) and 
-[anndata](https://cran.r-project.org/web/packages/anndata/index.html)
+This package imports functions from [ontologyIndex](https://CRAN.R-project.org/package=ontologyIndex), [ontologyPlot](https://CRAN.R-project.org/package=ontologyPlot) and 
+[anndata](https://CRAN.R-project.org/package=anndata)

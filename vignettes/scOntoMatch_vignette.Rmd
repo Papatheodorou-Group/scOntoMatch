@@ -21,8 +21,11 @@ knitr::opts_chunk$set(echo = TRUE, dpi=300)
 ```{r install}
 
 ## install from source
-# install.packages("devtools")
+if (!require("devtools")) install.packages("devtools")
+if (!require("anndata")) install.packages("anndata")
+
 library(devtools)
+library(anndata)
 
 devtools::install_github("YY-SONG0718/scOntoMatch")
 
