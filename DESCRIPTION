@@ -1,6 +1,6 @@
 Package: scOntoMatch
 Type: Package
-Title: Aligning Ontology Annotation Granularity Across Single Cell RNA-Seq Datasets with scOntoMatch
+Title: Aligning Ontology Annotation Across Single Cell RNA-Seq Datasets with scOntoMatch
 Version: 0.1.0
 Authors@R: c(person("Yuyao", "Song", email = "ysong@ebi.ac.uk", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9738-9726")))
 Author: Yuyao Song [aut, cre] (<https://orcid.org/0000-0001-9738-9726>)
@@ -13,6 +13,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.0
+Depends: R(>= 3.5)
 Suggests: 
-    knitr, devtools
+    knitr, devtools, SeuratObject
 VignetteBuilder: knitr
