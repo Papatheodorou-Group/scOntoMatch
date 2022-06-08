@@ -22,16 +22,16 @@ knitr::opts_chunk$set(echo = TRUE, dpi=300)
 
 ## install from source
 if (!require("devtools")) install.packages("devtools")
+devtools::install_github("YY-SONG0718/scOntoMatch", ref = 'seurat_obj')
 
-#devtools::install_github("YY-SONG0718/scOntoMatch")
-devtools::load_all("/Users/ysong/SOFTWARE/scOntoMatch/scOntoMatch")
-#library(scOntoMatch)
+library(scOntoMatch)
 library(ontologyIndex)
 ```
 
 ## Load data
 
-Use the smartseq-2 lung dataset from Tabula Muris and Tabula Sapiens as example
+We use the Tabula Muris and Tabula Sapiens Smartseq-2 lung dataset as example. `scOntoMatch` works on *any number* of input datasets. 
+Two demo seurat object are attached in inst/extdata, where we sampled two cells per cell type (original annotation) and focus on the cell type hierarchy in the two datasets.
 
 ```{r load data}
 metadata = '../inst/extdata/metadata.tsv'
@@ -44,25 +44,39 @@ propagate_relationships = c('is_a', 'part_of')
 ont <- ontologyIndex::get_OBO(obo_file, propagate_relationships = propagate_relationships)
 ```
 
+Organize the `data name` and `path` as first and second column in a metadata file.
+Store the seurat object in RDS format and use `getSeuratRds` to read them in.
 
-## Match ontology
-
-### Trim the ontology tree per dataset
-
-Merging descendant terms to existing ancestor terms in the datasets to get a minimum ontology representation
 ```{r load adata}
 
 obj_list = getSeuratRds(metadata = metadata, sep = "\t")
-head(obj_list$TM_lung@meta.data)
 ```
+```{r}
+levels(factor((obj_list$TM_lung@meta.data$cell_ontology_class)))
+levels(factor((obj_list$TS_lung@meta.data$cell_ontology_class)))
+```
+
+## Match ontology annotation
+
+### Trim the ontology tree per dataset
+
+It is common that within each dataset, there will be parent-children relationship between cell types. This is because some cells are able to be further classified into more fine-grained groups, while some other cells are only recognized as the respective parental cell type. 
+
+This is not a problem for analyzing individual datasets - we do want to keep those rare, identifiable cell populations distinct. However it could be a problem when we want to map annotation cross-dataset, since it is obscure what population the parent term contains in different datasets.
+
+We provide `ontoMultiMinimal` for Merging descendant terms to existing ancestor terms in one dataset, to get a minimum ontology representation of the cell type tree.
+
+*Note* it is optional to trim the ontology tree, and it is always possible to get back to the original annotation later during analysis.
+
 ```{r ontoMultiMinimal}
 obj_list_minimal = scOntoMatch::ontoMultiMinimal(obj_list = obj_list, ont = ont, anno_col = anno_col, onto_id_col = onto_id_col)
 ```   
 
-We can see that some cell types in adata2 can not match to an ontology term. Consider manual re-annotate. Note that always check literature before manual curation.
+We can see that some cell types in TS_lung cannot match to an ontology term. Consider manual re-annotate. We advise that do always check literature before manual curation and make sure you want the ontology annotation!
+
 ```{r re-annotate}
 obj_list$TS_lung@meta.data[[anno_col]] = as.character(obj_list$TS_lung@meta.data[[anno_col]])
-obj_list$TM_lung@meta.data[[anno_col]] = as.character(obj_list$TM_lung@meta.data[[anno_col]])
+
 ## nk cell can certainly be matched
 obj_list$TS_lung@meta.data[which(obj_list$TS_lung@meta.data[[anno_col]] == 'nk cell'), anno_col] = 'natural killer cell'
 
@@ -79,8 +93,11 @@ Now we can trim again
 ```{r ontoMultiMinimal_new}
 obj_list_minimal = scOntoMatch::ontoMultiMinimal(obj_list = obj_list, ont = ont, anno_col = anno_col, onto_id_col = onto_id_col)
 ```
+
 ### Ontology tree for individual dataset
-before trimming
+
+Functions are provided to plot cell type tree. Before trimming, there are parental-children relationships within both datasets.
+
 ```{r plotOntoTree}
 
 
@@ -102,7 +119,8 @@ plotOntoTree(ont = ont,
 ```
 
 
-after trimming
+After trimming, we get a minimal representation of cell type hierarchy per dataset.
+
 ```{r plotOntoTree_minimal}
 
 plotOntoTree(ont = ont, 
@@ -120,10 +138,12 @@ plotOntoTree(ont = ont,
                           plot_ancestors = TRUE,  roots = 'CL:0000548',
                           fontsize=25)
 ```
+Now, each cell type in the two datasets is a leaf node in the cell type tree.
+They are ready to be mapped.
 
+### Match ontology annotation cross datasets
 
-### ontoMatch
-The core action of `ontoMatch` is to map descendant terms in one dataset to existing ancestor terms in the other dataset reciprocally
+The core functionality of `scOntoMatch` is to find at which layer of cell type hierarchy we get one-to-one matching of cell types across datasets. Key idea is to look at the cell type hierarchies in these datasets together, find the last common ancestor cell types, and merge descendants to ancestors. We provide `ontoMultiMatch` for this purpose.
 
 ```{r ontoMultiMatch}
 
@@ -131,7 +151,7 @@ The core action of `ontoMatch` is to map descendant terms in one dataset to exis
 
 obj_list_matched = scOntoMatch::ontoMultiMatch(obj_list = obj_list_minimal, anno_col = 'cell_ontology_base', onto_id_col = onto_id_col, ont = ont)
 ```
-
+Finally, we plot a combined cell type tree and highlighting the exixting cell types of each dataset.
 ```{r plotMatchedOntoTree}
 
 plts = plotMatchedOntoTree(ont = ont, obj_list = obj_list_matched,
