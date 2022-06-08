@@ -5,15 +5,15 @@
 \title{In a matched ontology tree there could be simultaneously ancestral terms and descendant terms within each dataset,
 this function takes the output of ontoMatch and merge descendant terms to ancestor terms, while not over-merge}
 \usage{
-ontoMatchMinimal(adatas, ont)
+ontoMatchMinimal(obj_list, ont)
 }
 \arguments{
-\item{adatas}{a list of adata files from the output of ontoMatch}
+\item{obj_list}{a list of obj files from the output of ontoMatch}
 
 \item{ont}{ontology object}
 }
 \value{
-a list of adata files with minimal ontology mapped to each other in obs[['cell_type_mapped_ontology_base']]
+a list of obj files with minimal ontology mapped to each other in obs[['cell_type_mapped_ontology_base']]
 }
 \description{
 In a matched ontology tree there could be simultaneously ancestral terms and descendant terms within each dataset,

@@ -78,9 +78,9 @@ getOntoMinimal <- function(ont, onts) {
 
 
 #' get the minimal ontology tree of a dataset by reducing descendant terms to ancestor terms
-#' return adata .obs[["cell_ontology_base"]] storing the reduced ontology annotation
+#' return  obj meta.data[["cell_ontology_base"]] storing the reduced ontology annotation
 #' @name ontoMinimal
-#' @param adata the anndata object
+#' @param obj the seurat object
 #' @param ont ontologyIndex object
 #' @param anno_col the cell ontology text annotation column name
 #' @param onto_id_col if also have ontology id column for direct mapping
@@ -89,40 +89,40 @@ getOntoMinimal <- function(ont, onts) {
 #' @export
 #'
 
-ontoMinimal <- function(adata, ont, anno_col, onto_id_col) {
-  if (!is.null(adata$obs[[onto_id_col]])) {
+ontoMinimal <- function(obj, ont, anno_col, onto_id_col) {
+  if (!is.null(obj@meta.data[[onto_id_col]])) {
     message("use existing ontology id")
-    onts1 <- names(ont$name[names(ont$id[ont$id %in% levels(factor(adata$obs[[onto_id_col]]))])])
+    onts1 <- names(ont$name[names(ont$id[ont$id %in% levels(factor(obj@meta.data[[onto_id_col]]))])])
   } else {
     message("translate annotation to ontology id")
-    onts1 <- names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(adata$obs[[anno_col]])))])])
+    onts1 <- names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(obj@meta.data[[anno_col]])))])])
 
-    if (length(onts1) != length(levels(factor(adata$obs[[onto_id_col]])))) {
-      message("warning: some cell type annotations do not have corresponding ontology id in adata, consider manual re-annotate: ")
-      message(paste(levels(factor(adata$obs[[anno_col]]))[!tolower(levels(factor(adata$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ", "))
+    if (length(onts1) != length(levels(factor(obj@meta.data[[onto_id_col]])))) {
+      message("warning: some cell type annotations do not have corresponding ontology id in obj, consider manual re-annotate: ")
+      message(paste(levels(factor(obj@meta.data[[anno_col]]))[!tolower(levels(factor(obj@meta.data[[anno_col]]))) %in% tolower(ont$name)], collapse = ", "))
     }
   }
 
   desc_to_ansc <- getOntoMinimal(ont = ont, onts = onts1)
 
-  adata$obs[["cell_ontology_base"]] <- as.character(adata$obs[[anno_col]])
+  obj@meta.data[["cell_ontology_base"]] <- as.character(obj@meta.data[[anno_col]])
 
   for (fromTerm in names(desc_to_ansc)) {
     toTerm <- desc_to_ansc[fromTerm]
     fromName <- ont$name[names(ont$id[ont$id == fromTerm])]
     toName <- ont$name[names(ont$id[ont$id == toTerm])]
     message(paste("mapping from name: ", fromName, " to name: ", toName, sep = ""))
-    adata$obs[which(tolower(adata$obs[[anno_col]]) == tolower(fromName)), "cell_ontology_base"] <- toName
+    obj@meta.data[which(tolower(obj@meta.data[[anno_col]]) == tolower(fromName)), "cell_ontology_base"] <- toName
   }
-  message(paste0("after matching to base level ontology, adata has cell types: ", paste(levels(factor(adata$obs[["cell_ontology_base"]])), collapse = ", ")))
-  return(adata)
+  message(paste0("after matching to base level ontology, obj has cell types: ", paste(levels(factor(obj@meta.data[["cell_ontology_base"]])), collapse = ", ")))
+  return(obj)
 }
 
 
 
-#' translate named list of adatas to named list of cell ontology ids per adata
+#' translate named list of obj_list to named list of cell ontology ids per obj
 #' @name ontoTranslate
-#' @param adatas a named list of adatas object
+#' @param obj_list a named list of seurat object
 #' @param ont ontologyIndex object
 #' @param anno_col the cell ontology text annotation column name
 #' @param onto_id_col if also have ontology id column for direct mapping
@@ -130,21 +130,21 @@ ontoMinimal <- function(adata, ont, anno_col, onto_id_col) {
 #' @export
 #'
 
-ontoTranslate <- function(adatas, ont, onto_id_col, anno_col) {
+ontoTranslate <- function(obj_list, ont, onto_id_col, anno_col) {
   onts <- list()
 
-  if (all(unlist(lapply(adatas, function(x) !is.null(x$obs[[onto_id_col]]))))) {
+  if (all(unlist(lapply(obj_list, function(x) !is.null(x@meta.data[[onto_id_col]]))))) {
     message("use existing ontology id")
-    for (i in seq(1, length(adatas))) {
-      onts[[names(adatas[i])]] <- names(ont$name[names(ont$id[ont$id %in% levels(factor(adatas[[i]]$obs[[onto_id_col]]))])])
+    for (i in seq(1, length(obj_list))) {
+      onts[[names(obj_list[i])]] <- names(ont$name[names(ont$id[ont$id %in% levels(factor(obj_list[[i]]@meta.data[[onto_id_col]]))])])
     }
   } else {
     message("translate annotation to ontology id")
 
-    for (i in seq(1, length(adatas))) {
-      message(paste0("translating ", names(adatas[i])))
-      onts[[names(adatas[i])]] <- names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(adatas[[i]]$obs[[anno_col]])))])])
-      check_ontology_translate(adata = adatas[[i]], onts = onts[[names(adatas[i])]], ont = ont, anno_col = anno_col)
+    for (i in seq(1, length(obj_list))) {
+      message(paste0("translating ", names(obj_list[i])))
+      onts[[names(obj_list[i])]] <- names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(obj_list[[i]]@meta.data[[anno_col]])))])])
+      check_ontology_translate(obj = obj_list[[i]], onts = onts[[names(obj_list[i])]], ont = ont, anno_col = anno_col)
     }
   }
 
@@ -152,38 +152,38 @@ ontoTranslate <- function(adatas, ont, onto_id_col, anno_col) {
 }
 
 
-#' get the minimal ontology tree of a list of adata objects by reducing descendant terms to ancestor terms
-#' return a named list of adata objects with $obs[["cell_ontology_base"]] storing the reduced ontology annotation
+#' get the minimal ontology tree of a list of obj objects by reducing descendant terms to ancestor terms
+#' return a named list of obj objects with meta.data[["cell_ontology_base"]] storing the reduced ontology annotation
 #' @name ontoMultiMinimal
-#' @param adatas a named list of adata objects
+#' @param obj_list a named list of seurat objects
 #' @param ont ontologyIndex object
 #' @param anno_col the cell ontology text annotation column name
 #' @param onto_id_col if also have ontology id column for direct mapping
-#' @return a named list of adata objects with $obs[["cell_ontology_base"]]
+#' @return a named list of obj objects with $obs[["cell_ontology_base"]]
 #' @importFrom ontologyIndex get_ancestors
 #' @export
 #'
 #'
 #'
 
-ontoMultiMinimal <- function(adatas, ont, anno_col = "cell_ontology_base", onto_id_col) {
-  onts <- ontoTranslate(adatas = adatas, ont = ont, onto_id_col = onto_id_col, anno_col = anno_col)
+ontoMultiMinimal <- function(obj_list, ont, anno_col = "cell_ontology_base", onto_id_col) {
+  onts <- ontoTranslate(obj_list = obj_list, ont = ont, onto_id_col = onto_id_col, anno_col = anno_col)
 
-  for (i in seq(1, length(adatas))) {
-    desc_to_ansc <- getOntoMinimal(ont = ont, onts = onts[[names(adatas[i])]])
-    adatas[[i]]$obs[["cell_ontology_base"]] <- as.character(adatas[[i]]$obs[[anno_col]])
+  for (i in seq(1, length(obj_list))) {
+    desc_to_ansc <- getOntoMinimal(ont = ont, onts = onts[[names(obj_list[i])]])
+    obj_list[[i]]@meta.data[["cell_ontology_base"]] <- as.character(obj_list[[i]]@meta.data[[anno_col]])
     for (fromTerm in names(desc_to_ansc)) {
       toTerm <- desc_to_ansc[fromTerm]
       fromName <- ont$name[names(ont$id[ont$id == fromTerm])]
       toName <- ont$name[names(ont$id[ont$id == toTerm])]
       message(paste("mapping from name: ", fromName, " to name: ", toName, sep = ""))
-      adatas[[i]]$obs[which(tolower(adatas[[i]]$obs[[anno_col]]) == tolower(fromName)), "cell_ontology_base"] <- toName
+      obj_list[[i]]@meta.data[which(tolower(obj_list[[i]]@meta.data[[anno_col]]) == tolower(fromName)), "cell_ontology_base"] <- toName
     }
-    message(paste0("after matching to base level ontology, ", names(adatas[i]), " has cell types: "))
-    message(paste(as.character(levels(factor(adatas[[i]]$obs[["cell_ontology_base"]]))), sep = ", ", collapse = ", "))
+    message(paste0("after matching to base level ontology, ", names(obj_list[i]), " has cell types: "))
+    message(paste(as.character(levels(factor(obj_list[[i]]@meta.data[["cell_ontology_base"]]))), sep = ", ", collapse = ", "))
   }
 
-  return(adatas)
+  return(obj_list)
 }
 
 
@@ -217,14 +217,14 @@ getOntoMultiMapping <- function(ont, onts) {
 
 
 #' Core function of scOntoMatch
-#' Match the ontology annotation of several adata files
+#' Match the ontology annotation of several obj files
 #' @name ontoMatch
 #' @param adata1 one anndata object
 #' @param adata2 the other anndata object
 #' @param anno_col the cell ontology text annotation column name
 #' @param onto_id_col if also have ontology id column for direct mapping
 #' @param ont ontology file loaded via get_OBO
-#' @return a list of adata files with annotation ontology mapped to each-other in obs[['cell_type_mapped_ontology']]
+#' @return a list of obj files with annotation ontology mapped to each-other in obs[['cell_type_mapped_ontology']]
 #' @importFrom ontologyIndex get_OBO
 #' @importFrom anndata read_h5ad
 #' @export
@@ -234,24 +234,24 @@ ontoMatch <- function(adata1, adata2, anno_col, onto_id_col, ont) {
   message("start matching the ontology annotation")
   ad_one <- adata1
   ad_two <- adata2
-  message(paste0("adata1 has cell types: ", paste(levels(factor(ad_one$obs[[anno_col]])), collapse = ", ")))
-  message(paste0("adata2 has cell types: ", paste(levels(factor(ad_two$obs[[anno_col]])), collapse = ", ")))
+  message(paste0("adata1 has cell types: ", paste(levels(factor(ad_one@meta.data[[anno_col]])), collapse = ", ")))
+  message(paste0("adata2 has cell types: ", paste(levels(factor(ad_two@meta.data[[anno_col]])), collapse = ", ")))
 
-  if (!is.null(ad_one$obs[[onto_id_col]]) & !is.null(ad_two$obs[[onto_id_col]])) {
+  if (!is.null(ad_one@meta.data[[onto_id_col]]) & !is.null(ad_two@meta.data[[onto_id_col]])) {
     message("use existing ontology id")
-    onts1 <- names(ont$name[names(ont$id[ont$id %in% levels(factor(ad_one$obs[[onto_id_col]]))])])
-    onts2 <- names(ont$name[names(ont$id[ont$id %in% levels(factor(ad_two$obs[[onto_id_col]]))])])
+    onts1 <- names(ont$name[names(ont$id[ont$id %in% levels(factor(ad_one@meta.data[[onto_id_col]]))])])
+    onts2 <- names(ont$name[names(ont$id[ont$id %in% levels(factor(ad_two@meta.data[[onto_id_col]]))])])
   } else {
     message("translate annotation to ontology id")
-    onts1 <- names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(ad_one$obs[[anno_col]])))])])
-    onts2 <- names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(ad_two$obs[[anno_col]])))])])
-    if (length(onts1) != length(levels(factor(ad_one$obs[[anno_col]])))) {
-      message("warning: some cell type annotations do not have corresponding ontology id in adata 1, consider manual re-annotate: ")
-      message(paste(levels(factor(ad_one$obs[[anno_col]]))[!tolower(levels(factor(ad_one$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ", "))
+    onts1 <- names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(ad_one@meta.data[[anno_col]])))])])
+    onts2 <- names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(ad_two@meta.data[[anno_col]])))])])
+    if (length(onts1) != length(levels(factor(ad_one@meta.data[[anno_col]])))) {
+      message("warning: some cell type annotations do not have corresponding ontology id in obj 1, consider manual re-annotate: ")
+      message(paste(levels(factor(ad_one@meta.data[[anno_col]]))[!tolower(levels(factor(ad_one@meta.data[[anno_col]]))) %in% tolower(ont$name)], collapse = ", "))
     }
-    if (length(onts2) != length(levels(factor(ad_two$obs[[anno_col]])))) {
-      message("warning: some cell type annotations do not have corresponding ontology id in adata 2, consider manual re-annotate: ")
-      message(paste(levels(factor(ad_two$obs[[anno_col]]))[!tolower(levels(factor(ad_two$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ", "))
+    if (length(onts2) != length(levels(factor(ad_two@meta.data[[anno_col]])))) {
+      message("warning: some cell type annotations do not have corresponding ontology id in obj 2, consider manual re-annotate: ")
+      message(paste(levels(factor(ad_two@meta.data[[anno_col]]))[!tolower(levels(factor(ad_two@meta.data[[anno_col]]))) %in% tolower(ont$name)], collapse = ", "))
     }
   }
 
@@ -259,53 +259,53 @@ ontoMatch <- function(adata1, adata2, anno_col, onto_id_col, ont) {
   mappings <- getOntoMapping(ont = ont, onts1 = onts1, onts2 = onts2)
 
 
-  ad_one$obs[["cell_type_mapped_ontology"]] <- as.character(ad_one$obs[[anno_col]])
-  ad_two$obs[["cell_type_mapped_ontology"]] <- as.character(ad_two$obs[[anno_col]])
+  ad_one@meta.data[["cell_type_mapped_ontology"]] <- as.character(ad_one@meta.data[[anno_col]])
+  ad_two@meta.data[["cell_type_mapped_ontology"]] <- as.character(ad_two@meta.data[[anno_col]])
 
   for (fromTerm in names(mappings)) {
     toTerm <- mappings[fromTerm]
     fromName <- ont$name[names(ont$id[ont$id == fromTerm])]
     toName <- ont$name[names(ont$id[ont$id == toTerm])]
     message(paste("mapping from name: ", fromName, " to name: ", toName, sep = ""))
-    ad_one$obs[which(tolower(ad_one$obs[[anno_col]]) == tolower(fromName)), "cell_type_mapped_ontology"] <- toName
-    ad_two$obs[which(tolower(ad_two$obs[[anno_col]]) == tolower(fromName)), "cell_type_mapped_ontology"] <- toName
+    ad_one@meta.data[which(tolower(ad_one@meta.data[[anno_col]]) == tolower(fromName)), "cell_type_mapped_ontology"] <- toName
+    ad_two@meta.data[which(tolower(ad_two@meta.data[[anno_col]]) == tolower(fromName)), "cell_type_mapped_ontology"] <- toName
   }
 
-  message(paste0("after mapping, adata1 has cell types: ", paste(levels(factor(ad_one$obs[["cell_type_mapped_ontology"]])), collapse = ", ")))
-  message(paste0("after mapping, adata2 has cell types: ", paste(levels(factor(ad_two$obs[["cell_type_mapped_ontology"]])), collapse = ", ")))
+  message(paste0("after mapping, adata1 has cell types: ", paste(levels(factor(ad_one@meta.data[["cell_type_mapped_ontology"]])), collapse = ", ")))
+  message(paste0("after mapping, adata2 has cell types: ", paste(levels(factor(ad_two@meta.data[["cell_type_mapped_ontology"]])), collapse = ", ")))
 
   return(list(ad_one, ad_two))
 }
 
 #' Core function of scOntoMatch
-#' Match the ontology annotation of multiple adata objects
+#' Match the ontology annotation of multiple obj objects
 #' @name ontoMultiMatch
-#' @param adatas a namesd list of anndata objects to match
+#' @param obj_list a namesd list of seurat objects to match
 #' @param ont ontologyIndex object
 #' @param anno_col the cell ontology text annotation column name
 #' @param onto_id_col if also have ontology id column for direct mapping
-#' @return a list of adata objects with annotation ontology mapped to each-other in obs[['cell_ontology_mapped']]
+#' @return a list of obj objects with annotation ontology mapped to each-other in obs[['cell_ontology_mapped']]
 #' @export
 
-ontoMultiMatch <- function(adatas, anno_col, onto_id_col, ont) {
-  onts <- ontoTranslate(adatas = adatas, ont = ont, onto_id_col = onto_id_col, anno_col = anno_col)
+ontoMultiMatch <- function(obj_list, anno_col, onto_id_col, ont) {
+  onts <- ontoTranslate(obj_list = obj_list, ont = ont, onto_id_col = onto_id_col, anno_col = anno_col)
   mappings <- getOntoMultiMapping(ont, onts = onts)
 
-  for (i in seq(1, length(adatas))) {
-    message(paste0("processing ", names(adatas[i])))
-    adatas[[i]]$obs[["cell_ontology_mapped"]] <- as.character(adatas[[i]]$obs[[anno_col]])
+  for (i in seq(1, length(obj_list))) {
+    message(paste0("processing ", names(obj_list[i])))
+    obj_list[[i]]@meta.data[["cell_ontology_mapped"]] <- as.character(obj_list[[i]]@meta.data[[anno_col]])
     for (fromTerm in names(mappings)) {
       toTerm <- mappings[fromTerm]
       fromName <- ont$name[names(ont$id[ont$id == fromTerm])]
       toName <- ont$name[names(ont$id[ont$id == toTerm])]
       message(paste("mapping from name: ", fromName, " to name: ", toName, sep = ""))
-      adatas[[i]]$obs[which(tolower(adatas[[i]]$obs[[anno_col]]) == tolower(fromName)), "cell_ontology_mapped"] <- toName
+      obj_list[[i]]@meta.data[which(tolower(obj_list[[i]]@meta.data[[anno_col]]) == tolower(fromName)), "cell_ontology_mapped"] <- toName
     }
-    message(paste0("after matching across datasets, ", names(adatas[i]), " has cell types: "))
-    message(paste(as.character(levels(factor(adatas[[i]]$obs[["cell_ontology_mapped"]]))), sep = ", ", collapse = ", "))
+    message(paste0("after matching across datasets, ", names(obj_list[i]), " has cell types: "))
+    message(paste(as.character(levels(factor(obj_list[[i]]@meta.data[["cell_ontology_mapped"]]))), sep = ", ", collapse = ", "))
   }
 
-  return(adatas)
+  return(obj_list)
 }
 
 
@@ -313,16 +313,16 @@ ontoMultiMatch <- function(adatas, anno_col, onto_id_col, ont) {
 #' this function takes the output of ontoMatch and merge descendant terms to ancestor terms, while not over-merge
 #' @name ontoMatchMinimal
 #' @param ont ontology object
-#' @param adatas a list of adata files from the output of ontoMatch
-#' @return a list of adata files with minimal ontology mapped to each other in obs[['cell_type_mapped_ontology_base']]
+#' @param obj_list a list of obj files from the output of ontoMatch
+#' @return a list of obj files with minimal ontology mapped to each other in obs[['cell_type_mapped_ontology_base']]
 #' @importFrom ontologyIndex get_OBO get_ancestors get_descendants minimal_set
 #' @export
 
 
-ontoMatchMinimal <- function(adatas, ont) {
+ontoMatchMinimal <- function(obj_list, ont) {
 
   # the new ontology terms that has been mapped between datasets
-  new_all <- unique(c(names(getOntologyId(adatas[[1]]$obs[["cell_type_mapped_ontology"]], ont = ont)), names(getOntologyId(adatas[[2]]$obs[["cell_type_mapped_ontology"]], ont = ont))))
+  new_all <- unique(c(names(getOntologyId(obj_list[[1]]@meta.data[["cell_type_mapped_ontology"]], ont = ont)), names(getOntologyId(obj_list[[2]]@meta.data[["cell_type_mapped_ontology"]], ont = ont))))
 
   # minimal_set(ont, new_all) is all the leaf terms in the current joint ontology tree
   # setdiff(new_all, minimal_set(ont, new_all)) contains intermediate terms
@@ -331,8 +331,8 @@ ontoMatchMinimal <- function(adatas, ont) {
   removed_terms_all <- setdiff(new_all, minimal_set(ont, new_all))
   removed_terms <- setdiff(removed_terms_all, minimal_set(ont, removed_terms_all))
 
-  new_terms_one <- names(getOntologyId(adatas[[1]]$obs[["cell_type_mapped_ontology"]], ont = ont))
-  new_terms_two <- names(getOntologyId(adatas[[2]]$obs[["cell_type_mapped_ontology"]], ont = ont))
+  new_terms_one <- names(getOntologyId(obj_list[[1]]@meta.data[["cell_type_mapped_ontology"]], ont = ont))
+  new_terms_two <- names(getOntologyId(obj_list[[2]]@meta.data[["cell_type_mapped_ontology"]], ont = ont))
 
   # get the mapping between elements to match to ancestor and the ancestor
   # it gives the same result to use new_terms_one or new_terms_two in the following line
@@ -342,8 +342,8 @@ ontoMatchMinimal <- function(adatas, ont) {
   mappings <- unlist(common_base, use.names = TRUE)
 
   # from previously unified annotation
-  adatas[[1]]$obs[["cell_type_mapped_ontology_base"]] <- adatas[[1]]$obs[["cell_type_mapped_ontology"]]
-  adatas[[2]]$obs[["cell_type_mapped_ontology_base"]] <- adatas[[2]]$obs[["cell_type_mapped_ontology"]]
+  obj_list[[1]]@meta.data[["cell_type_mapped_ontology_base"]] <- obj_list[[1]]@meta.data[["cell_type_mapped_ontology"]]
+  obj_list[[2]]@meta.data[["cell_type_mapped_ontology_base"]] <- obj_list[[2]]@meta.data[["cell_type_mapped_ontology"]]
 
   ## perform mapping
   for (fromTerm in names(mappings)) {
@@ -351,11 +351,11 @@ ontoMatchMinimal <- function(adatas, ont) {
     fromName <- ont$name[names(ont$id[ont$id == fromTerm])]
     toName <- ont$name[names(ont$id[ont$id == toTerm])]
     message(paste("mapping from name: ", fromName, " to name: ", toName, sep = ""))
-    adatas[[1]]$obs[which(adatas[[1]]$obs[["cell_type_mapped_ontology"]] == fromName), "cell_type_mapped_ontology_base"] <- toName
-    adatas[[2]]$obs[which(adatas[[2]]$obs[["cell_type_mapped_ontology"]] == fromName), "cell_type_mapped_ontology_base"] <- toName
+    obj_list[[1]]@meta.data[which(obj_list[[1]]@meta.data[["cell_type_mapped_ontology"]] == fromName), "cell_type_mapped_ontology_base"] <- toName
+    obj_list[[2]]@meta.data[which(obj_list[[2]]@meta.data[["cell_type_mapped_ontology"]] == fromName), "cell_type_mapped_ontology_base"] <- toName
   }
 
-  return(adatas)
+  return(obj_list)
 }
 
 
@@ -397,7 +397,7 @@ plotOntoTree <- function(ont, onts, plot_ancestors = TRUE, ont_query = NULL, roo
 #' Plot a ontology tree with matched ontology from ontoMatch
 #' @name plotMatchedOntoTree
 #' @param ont ontology object
-#' @param adatas a list of adata files as the output of ontoMatch
+#' @param obj_list a list of seurat obj files as the output of ontoMatch
 #' @param anno_col the cell ontology text annotation column name
 #' @param onto_id_col if also have ontology id column for direct mapping
 #' @param ... additional parameters for ontologyPlot::onto_plot
@@ -408,13 +408,13 @@ plotOntoTree <- function(ont, onts, plot_ancestors = TRUE, ont_query = NULL, roo
 #' @importFrom ontologyIndex get_ancestors intersection_with_descendants
 #' @export
 #'
-plotMatchedOntoTree <- function(adatas, ont, anno_col, onto_id_col, roots = c("CL:0000548"), ...) {
+plotMatchedOntoTree <- function(obj_list, ont, anno_col, onto_id_col, roots = c("CL:0000548"), ...) {
   plots <- list()
-  onts <- suppressMessages(ontoTranslate(adatas, ont, onto_id_col, anno_col = anno_col))
+  onts <- suppressMessages(ontoTranslate(obj_list, ont, onto_id_col, anno_col = anno_col))
   all <- unique(flatten_chr(onts))
 
-  for (i in seq(1, length(adatas))) {
-    plots[[names(adatas[i])]] <- plotOntoTree(ont = ont, onts = all, ont_query = names(getOntologyId(adatas[[i]]$obs[[anno_col]], ont = ont)), plot_ancestors = TRUE, roots = roots, ...)
+  for (i in seq(1, length(obj_list))) {
+    plots[[names(obj_list[i])]] <- plotOntoTree(ont = ont, onts = all, ont_query = names(getOntologyId(obj_list[[i]]@meta.data[[anno_col]], ont = ont)), plot_ancestors = TRUE, roots = roots, ...)
   }
 
   return(plots)

@@ -5,7 +5,7 @@
 \title{Plot a ontology tree with matched ontology from ontoMatch}
 \usage{
 plotMatchedOntoTree(
-  adatas,
+  obj_list,
   ont,
   anno_col,
   onto_id_col,
@@ -14,7 +14,7 @@ plotMatchedOntoTree(
 )
 }
 \arguments{
-\item{adatas}{a list of adata files as the output of ontoMatch}
+\item{obj_list}{a list of seurat obj files as the output of ontoMatch}
 
 \item{ont}{ontology object}
 

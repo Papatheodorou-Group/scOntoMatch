@@ -3,12 +3,12 @@
 \name{ontoMultiMatch}
 \alias{ontoMultiMatch}
 \title{Core function of scOntoMatch
-Match the ontology annotation of multiple adata objects}
+Match the ontology annotation of multiple obj objects}
 \usage{
-ontoMultiMatch(adatas, anno_col, onto_id_col, ont)
+ontoMultiMatch(obj_list, anno_col, onto_id_col, ont)
 }
 \arguments{
-\item{adatas}{a namesd list of anndata objects to match}
+\item{obj_list}{a namesd list of seurat objects to match}
 
 \item{anno_col}{the cell ontology text annotation column name}
 
@@ -17,9 +17,9 @@ ontoMultiMatch(adatas, anno_col, onto_id_col, ont)
 \item{ont}{ontologyIndex object}
 }
 \value{
-a list of adata objects with annotation ontology mapped to each-other in obs[['cell_ontology_mapped']]
+a list of obj objects with annotation ontology mapped to each-other in obs[['cell_ontology_mapped']]
 }
 \description{
 Core function of scOntoMatch
-Match the ontology annotation of multiple adata objects
+Match the ontology annotation of multiple obj objects
 }

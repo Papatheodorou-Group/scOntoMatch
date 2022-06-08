@@ -3,12 +3,12 @@
 \name{ontoMinimal}
 \alias{ontoMinimal}
 \title{get the minimal ontology tree of a dataset by reducing descendant terms to ancestor terms
-return adata .obs[["cell_ontology_base"]] storing the reduced ontology annotation}
+return  obj meta.data[["cell_ontology_base"]] storing the reduced ontology annotation}
 \usage{
-ontoMinimal(adata, ont, anno_col, onto_id_col)
+ontoMinimal(obj, ont, anno_col, onto_id_col)
 }
 \arguments{
-\item{adata}{the anndata object}
+\item{obj}{the seurat object}
 
 \item{ont}{ontologyIndex object}
 
@@ -21,5 +21,5 @@ an anndata object with .obs[["cell_ontology_base"]]
 }
 \description{
 get the minimal ontology tree of a dataset by reducing descendant terms to ancestor terms
-return adata .obs[["cell_ontology_base"]] storing the reduced ontology annotation
+return  obj meta.data[["cell_ontology_base"]] storing the reduced ontology annotation
 }

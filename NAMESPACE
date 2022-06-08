@@ -2,12 +2,12 @@
 
 export(check_ontology_translate)
 export(fill_query)
-export(getAdatas)
 export(getOntoMapping)
 export(getOntoMinimal)
 export(getOntoMultiMapping)
 export(getOntologyId)
 export(getOntologyName)
+export(getSeuratRds)
 export(ontoMatch)
 export(ontoMatchMinimal)
 export(ontoMinimal)

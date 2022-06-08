@@ -3,7 +3,7 @@
 \name{ontoMatch}
 \alias{ontoMatch}
 \title{Core function of scOntoMatch
-Match the ontology annotation of several adata files}
+Match the ontology annotation of several obj files}
 \usage{
 ontoMatch(adata1, adata2, anno_col, onto_id_col, ont)
 }
@@ -19,9 +19,9 @@ ontoMatch(adata1, adata2, anno_col, onto_id_col, ont)
 \item{ont}{ontology file loaded via get_OBO}
 }
 \value{
-a list of adata files with annotation ontology mapped to each-other in obs[['cell_type_mapped_ontology']]
+a list of obj files with annotation ontology mapped to each-other in obs[['cell_type_mapped_ontology']]
 }
 \description{
 Core function of scOntoMatch
-Match the ontology annotation of several adata files
+Match the ontology annotation of several obj files
 }

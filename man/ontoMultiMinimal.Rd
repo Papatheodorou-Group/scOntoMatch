@@ -2,13 +2,13 @@
 % Please edit documentation in R/functions.R
 \name{ontoMultiMinimal}
 \alias{ontoMultiMinimal}
-\title{get the minimal ontology tree of a list of adata objects by reducing descendant terms to ancestor terms
-return a named list of adata objects with $obs[["cell_ontology_base"]] storing the reduced ontology annotation}
+\title{get the minimal ontology tree of a list of obj objects by reducing descendant terms to ancestor terms
+return a named list of obj objects with meta.data[["cell_ontology_base"]] storing the reduced ontology annotation}
 \usage{
-ontoMultiMinimal(adatas, ont, anno_col = "cell_ontology_base", onto_id_col)
+ontoMultiMinimal(obj_list, ont, anno_col = "cell_ontology_base", onto_id_col)
 }
 \arguments{
-\item{adatas}{a named list of adata objects}
+\item{obj_list}{a named list of seurat objects}
 
 \item{ont}{ontologyIndex object}
 
@@ -17,9 +17,9 @@ ontoMultiMinimal(adatas, ont, anno_col = "cell_ontology_base", onto_id_col)
 \item{onto_id_col}{if also have ontology id column for direct mapping}
 }
 \value{
-a named list of adata objects with $obs[["cell_ontology_base"]]
+a named list of obj objects with $obs[["cell_ontology_base"]]
 }
 \description{
-get the minimal ontology tree of a list of adata objects by reducing descendant terms to ancestor terms
-return a named list of adata objects with $obs[["cell_ontology_base"]] storing the reduced ontology annotation
+get the minimal ontology tree of a list of obj objects by reducing descendant terms to ancestor terms
+return a named list of obj objects with meta.data[["cell_ontology_base"]] storing the reduced ontology annotation
 }

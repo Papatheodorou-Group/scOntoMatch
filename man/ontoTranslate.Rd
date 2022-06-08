@@ -2,12 +2,12 @@
 % Please edit documentation in R/functions.R
 \name{ontoTranslate}
 \alias{ontoTranslate}
-\title{translate named list of adatas to named list of cell ontology ids per adata}
+\title{translate named list of obj_list to named list of cell ontology ids per obj}
 \usage{
-ontoTranslate(adatas, ont, onto_id_col, anno_col)
+ontoTranslate(obj_list, ont, onto_id_col, anno_col)
 }
 \arguments{
-\item{adatas}{a named list of adatas object}
+\item{obj_list}{a named list of seurat object}
 
 \item{ont}{ontologyIndex object}
 
@@ -19,5 +19,5 @@ ontoTranslate(adatas, ont, onto_id_col, anno_col)
 a named list of cell ontology ids
 }
 \description{
-translate named list of adatas to named list of cell ontology ids per adata
+translate named list of obj_list to named list of cell ontology ids per obj
 }

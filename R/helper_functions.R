@@ -1,15 +1,14 @@
 
 #' read in anndata files as a named list of anndata object
-#' @name getAdatas
-#' @param metadata a metadaat file indicating name, path to adata file
+#' @name getSeuratRds
+#' @param metadata a metadata file indicating name, path to seurat rds file
 #' @param sep sep of the metadata file
-#' @importFrom anndata read_h5ad
 #' @importFrom utils read.table setTxtProgressBar txtProgressBar
 #' @export
 #'
-getAdatas <- function(metadata, sep ) {
+getSeuratRds <- function(metadata, sep ) {
   metadata <- read.table(metadata, sep = sep, col.names = c("name", "path"))
-  adatas <- list()
+  obj_list <- list()
   n_iter <- nrow(metadata) # Number of iterations of the loop
 
   # Initializes the progress bar
@@ -18,14 +17,14 @@ getAdatas <- function(metadata, sep ) {
                        style = 3,    # Progress bar style (also available style = 1 and style = 2)
                        width = 50,   # Progress bar width. Defaults to getOption("width")
                        char = "=") # Character used to create the bar
-  message("start loading adata objects")
+  message("start loading seurat rds objects")
   for(i in 1:n_iter) {
 
     #---------------------
     # Code to be executed
     #---------------------
 
-    adatas[[metadata[i, "name"]]] <- anndata::read_h5ad(metadata[i, "path"])
+    obj_list[[metadata[i, "name"]]] <- readRDS(metadata[i, "path"])
     #---------------------
 
     # Sets the progress bar to the current state
@@ -34,24 +33,24 @@ getAdatas <- function(metadata, sep ) {
 
   close(pb) # Close the connection
 
-  return(adatas)
+  return(obj_list)
 }
 
 #' make sure ontology names are all translated to ontology ids
 #' while warning, consider manual reannotation
 #' @name check_ontology_translate
-#' @param adata anndata file
+#' @param obj seurat rds object
 #' @param onts ontology ids from translate
 #' @param ont ontologyIndex object
-#' @param anno_col annotation column in adata$obs that is translated to onts ids
+#' @param anno_col annotation column in obj@meta.data that is translated to onts ids
 #' @export
 #'
 
 
-check_ontology_translate <- function(adata, onts, ont, anno_col) {
-  if (length(onts) != length(levels(factor(adata$obs[[anno_col]])))) {
+check_ontology_translate <- function(obj, onts, ont, anno_col) {
+  if (length(onts) != length(levels(factor(obj@meta.data[[anno_col]])))) {
     message("warning: some cell type annotations do not have corresponding ontology id, consider manual re-annotate")
-    message(paste(levels(factor(adata$obs[[anno_col]]))[!tolower(levels(factor(adata$obs[[anno_col]]))) %in% tolower(ont$name)], collapse = ", ", sep = ", "))
+    message(paste(levels(factor(obj@meta.data[[anno_col]]))[!tolower(levels(factor(obj@meta.data[[anno_col]]))) %in% tolower(ont$name)], collapse = ", ", sep = ", "))
   } else {
     (
       message("ontology annotation translate to id successful")

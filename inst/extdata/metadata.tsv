@@ -1,2 +1,2 @@
-TM_lung	../inst/extdata/TM_Lung_smartseq2_down_sampled.h5ad
-TS_lung	../inst/extdata/TS_Lung_smartseq2_down_sampled.h5ad
+TM_lung	../inst/extdata/TM_Lung_SS2_demo.rds
+TS_lung	../inst/extdata/TS_Lung_SS2_demo.rds

@@ -5,16 +5,16 @@
 \title{make sure ontology names are all translated to ontology ids
 while warning, consider manual reannotation}
 \usage{
-check_ontology_translate(adata, onts, ont, anno_col)
+check_ontology_translate(obj, onts, ont, anno_col)
 }
 \arguments{
-\item{adata}{anndata file}
+\item{obj}{seurat rds object}
 
 \item{onts}{ontology ids from translate}
 
 \item{ont}{ontologyIndex object}
 
-\item{anno_col}{annotation column in adata$obs that is translated to onts ids}
+\item{anno_col}{annotation column in obj@meta.data that is translated to onts ids}
 }
 \description{
 make sure ontology names are all translated to ontology ids
