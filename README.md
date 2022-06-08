@@ -29,6 +29,8 @@ First download the ontology `.obo` file from [the OBO foundry](https://obofoundr
 Refer to [vignette](https://github.com/YY-SONG0718/scOntoMatch/blob/main/vignettes/scOntoMatch_vignette.Rmd) for detailed usage.
 
 Get input ready
+
+*Note* for anndata .h5ad inputs, goto main branch, for seurat object .rds inputs, goto seurat_obj branch
 ```
 adatas = getAdatas(metadata = metadata, sep = "\t")
 ont = ontologyIndex::get_OBO(oboFile, propagate_relationships = c('is_a', 'part_of'), )
