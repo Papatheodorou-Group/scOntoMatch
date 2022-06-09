@@ -202,14 +202,19 @@ getOntoMultiMapping <- function(ont, onts) {
   intersection <- Reduce(intersect, onts)
   mappings <- c()
   mappings[intersection] <- intersection
-  message(paste0("intersection terms: ", intersection))
+  message(paste0("intersection terms: ", paste0(intersection, collapse = ", ")))
 
   onts_new <- lapply(onts, FUN = function(x) x[!x %in% intersection])
   onts_all <- flatten_chr(onts_new)
 
   desc_to_ansc <- getOntoMinimal(ont = ont, onts = onts_all)
-  for (i in seq(1, length(desc_to_ansc))) {
+  if(length(desc_to_ansc) == 0){
+    return(mappings)
+
+  } else {
+    for (i in seq(1, length(desc_to_ansc))) {
     mappings[names(desc_to_ansc[i])] <- desc_to_ansc[[i]]
+    }
   }
 
   return(mappings)
