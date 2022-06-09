@@ -208,8 +208,13 @@ getOntoMultiMapping <- function(ont, onts) {
   onts_all <- flatten_chr(onts_new)
 
   desc_to_ansc <- getOntoMinimal(ont = ont, onts = onts_all)
-  for (i in seq(1, length(desc_to_ansc))) {
-    mappings[names(desc_to_ansc[i])] <- desc_to_ansc[[i]]
+  if(length(desc_to_ansc) == 0){
+    return(mappings)
+
+  } else {
+    for (i in seq(1, length(desc_to_ansc))) {
+      mappings[names(desc_to_ansc[i])] <- desc_to_ansc[[i]]
+    }
   }
 
   return(mappings)
