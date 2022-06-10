@@ -221,66 +221,6 @@ getOntoMultiMapping <- function(ont, onts) {
 }
 
 
-#' Core function of scOntoMatch
-#' Match the ontology annotation of several obj files
-#' @name ontoMatch
-#' @param adata1 one anndata object
-#' @param adata2 the other anndata object
-#' @param anno_col the cell ontology text annotation column name
-#' @param onto_id_col if also have ontology id column for direct mapping
-#' @param ont ontology file loaded via get_OBO
-#' @return a list of obj files with annotation ontology mapped to each-other in obs[['cell_type_mapped_ontology']]
-#' @importFrom ontologyIndex get_OBO
-#' @importFrom anndata read_h5ad
-#' @export
-
-
-ontoMatch <- function(adata1, adata2, anno_col, onto_id_col, ont) {
-  message("start matching the ontology annotation")
-  ad_one <- adata1
-  ad_two <- adata2
-  message(paste0("adata1 has cell types: ", paste(levels(factor(ad_one@meta.data[[anno_col]])), collapse = ", ")))
-  message(paste0("adata2 has cell types: ", paste(levels(factor(ad_two@meta.data[[anno_col]])), collapse = ", ")))
-
-  if (!is.null(ad_one@meta.data[[onto_id_col]]) & !is.null(ad_two@meta.data[[onto_id_col]])) {
-    message("use existing ontology id")
-    onts1 <- names(ont$name[names(ont$id[ont$id %in% levels(factor(ad_one@meta.data[[onto_id_col]]))])])
-    onts2 <- names(ont$name[names(ont$id[ont$id %in% levels(factor(ad_two@meta.data[[onto_id_col]]))])])
-  } else {
-    message("translate annotation to ontology id")
-    onts1 <- names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(ad_one@meta.data[[anno_col]])))])])
-    onts2 <- names(ont$name[names(ont$id[tolower(ont$name) %in% tolower(levels(factor(ad_two@meta.data[[anno_col]])))])])
-    if (length(onts1) != length(levels(factor(ad_one@meta.data[[anno_col]])))) {
-      message("warning: some cell type annotations do not have corresponding ontology id in obj 1, consider manual re-annotate: ")
-      message(paste(levels(factor(ad_one@meta.data[[anno_col]]))[!tolower(levels(factor(ad_one@meta.data[[anno_col]]))) %in% tolower(ont$name)], collapse = ", "))
-    }
-    if (length(onts2) != length(levels(factor(ad_two@meta.data[[anno_col]])))) {
-      message("warning: some cell type annotations do not have corresponding ontology id in obj 2, consider manual re-annotate: ")
-      message(paste(levels(factor(ad_two@meta.data[[anno_col]]))[!tolower(levels(factor(ad_two@meta.data[[anno_col]]))) %in% tolower(ont$name)], collapse = ", "))
-    }
-  }
-
-
-  mappings <- getOntoMapping(ont = ont, onts1 = onts1, onts2 = onts2)
-
-
-  ad_one@meta.data[["cell_type_mapped_ontology"]] <- as.character(ad_one@meta.data[[anno_col]])
-  ad_two@meta.data[["cell_type_mapped_ontology"]] <- as.character(ad_two@meta.data[[anno_col]])
-
-  for (fromTerm in names(mappings)) {
-    toTerm <- mappings[fromTerm]
-    fromName <- ont$name[names(ont$id[ont$id == fromTerm])]
-    toName <- ont$name[names(ont$id[ont$id == toTerm])]
-    message(paste("mapping from name: ", fromName, " to name: ", toName, sep = ""))
-    ad_one@meta.data[which(tolower(ad_one@meta.data[[anno_col]]) == tolower(fromName)), "cell_type_mapped_ontology"] <- toName
-    ad_two@meta.data[which(tolower(ad_two@meta.data[[anno_col]]) == tolower(fromName)), "cell_type_mapped_ontology"] <- toName
-  }
-
-  message(paste0("after mapping, adata1 has cell types: ", paste(levels(factor(ad_one@meta.data[["cell_type_mapped_ontology"]])), collapse = ", ")))
-  message(paste0("after mapping, adata2 has cell types: ", paste(levels(factor(ad_two@meta.data[["cell_type_mapped_ontology"]])), collapse = ", ")))
-
-  return(list(ad_one, ad_two))
-}
 
 #' Core function of scOntoMatch
 #' Match the ontology annotation of multiple obj objects
