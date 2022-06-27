@@ -16,6 +16,9 @@ check_ontology_translate(obj, onts, ont, anno_col)
 
 \item{anno_col}{annotation column in obj@meta.data that is translated to onts ids}
 }
+\value{
+do not return a value but output messages
+}
 \description{
 make sure ontology names are all translated to ontology ids
 while warning, consider manual reannotation

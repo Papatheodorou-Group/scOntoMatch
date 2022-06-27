@@ -3,8 +3,12 @@
 #' @param ont the ontology object from get_OBO
 #' @param onts1 a character vector of ontology id
 #' @param onts2 a character vector of ontology id
-#' @return a names list for ontology id mapping looks like ontology_id:ontology_id
-#' @importFrom ontologyIndex get_ancestors
+#' @return a named list for ontology id mapping looks like ontology_id:ontology_id
+#' @examples
+#' \dontrun{
+#' getOntoMapping(ont = ont, onts1 = "CL:0000548", onts2 = c("CL0000548", "CL:0000066"))
+#' }
+#' @importFrom ontologyIndex get_ancestors minimal_set
 #' @export
 
 getOntoMapping <- function(ont, onts1, onts2) {
@@ -18,8 +22,8 @@ getOntoMapping <- function(ont, onts1, onts2) {
   onts1 <- onts1[!onts1 %in% intersection]
   onts2 <- onts2[!onts2 %in% intersection]
 
-  onts1 <- minimal_set(ont, onts1)
-  onts2 <- minimal_set(ont, onts2)
+  onts1 <- ontologyIndex::minimal_set(ont, onts1)
+  onts2 <- ontologyIndex::minimal_set(ont, onts2)
 
   ancestors_onts_1 <- lapply(onts1, function(x) ontologyIndex::get_ancestors(ont, x))
   ancestors_onts_2 <- lapply(onts2, function(x) ontologyIndex::get_ancestors(ont, x))
@@ -57,12 +61,15 @@ getOntoMapping <- function(ont, onts1, onts2) {
 #' @name getOntoMinimal
 #' @param ont the ontology object from get_OBO
 #' @param onts a character vector of ontology id
-#' @return a names list for ontology id mapping looks like ontology_id:ontology_id
+#' @return a named list for ontology id mapping looks like ontology_id:ontology_id
+#' @examples
+#' \dontrun{
+#' getOntoMinimal(ont = ont, onts = c("CL0000548", "CL:0000066", "CL:0000082"))
+#' }
 #' @importFrom ontologyIndex get_ancestors
 #' @export
 #'
-#'
-#'
+
 getOntoMinimal <- function(ont, onts) {
   ansc_to_desc <- lapply(structure(onts, names = onts), function(x) onts[unlist(lapply(onts, function(y) x %in% get_ancestors(ont, y) & x != y))])
   ansc_to_desc <- ansc_to_desc[unlist(lapply(ansc_to_desc, function(x) length(x) > 0))]
@@ -84,7 +91,11 @@ getOntoMinimal <- function(ont, onts) {
 #' @param ont ontologyIndex object
 #' @param anno_col the cell ontology text annotation column name
 #' @param onto_id_col if also have ontology id column for direct mapping
-#' @return an anndata object with .obs[["cell_ontology_base"]]
+#' @return an seurat object with  meta.data[["cell_ontology_base"]]
+#' @examples
+#' \dontrun{
+#' ontoMinimal(obj = seurat_obj, ont = ont, anno_col = 'ontology_name', onto_id_col = 'ontology_id')
+#' }
 #' @importFrom ontologyIndex get_ancestors
 #' @export
 #'
@@ -127,6 +138,10 @@ ontoMinimal <- function(obj, ont, anno_col, onto_id_col) {
 #' @param anno_col the cell ontology text annotation column name
 #' @param onto_id_col if also have ontology id column for direct mapping
 #' @return a named list of cell ontology ids
+#' @examples
+#' \dontrun{
+#' ontoTranslate(seurat_obj_list, ont, 'ontology_name', 'ontology_id')
+#' }
 #' @export
 #'
 
@@ -152,18 +167,20 @@ ontoTranslate <- function(obj_list, ont, onto_id_col, anno_col) {
 }
 
 
-#' get the minimal ontology tree of a list of obj objects by reducing descendant terms to ancestor terms
-#' return a named list of obj objects with meta.data[["cell_ontology_base"]] storing the reduced ontology annotation
+#' get the minimal ontology tree of a list of seurat objects by reducing descendant terms to ancestor terms
+#' return a named list of seurat objects with meta.data[["cell_ontology_base"]] storing the reduced ontology annotation
 #' @name ontoMultiMinimal
 #' @param obj_list a named list of seurat objects
 #' @param ont ontologyIndex object
 #' @param anno_col the cell ontology text annotation column name
 #' @param onto_id_col if also have ontology id column for direct mapping
-#' @return a named list of obj objects with $obs[["cell_ontology_base"]]
+#' @return a named list of seurat objects with meta.data[["cell_ontology_base"]]
+#' @examples
+#' \dontrun{
+#' ontoMultiMinimal(seurat_obj_list, ont, "cell_ontology_base", 'ontology_id')
+#' }
 #' @importFrom ontologyIndex get_ancestors
 #' @export
-#'
-#'
 #'
 
 ontoMultiMinimal <- function(obj_list, ont, anno_col = "cell_ontology_base", onto_id_col) {
@@ -193,6 +210,10 @@ ontoMultiMinimal <- function(obj_list, ont, anno_col = "cell_ontology_base", ont
 #' @param onts named list of ontology ids
 #' @param ont ontologyIndex object
 #' @return a named character of mapping from:mapping to
+#' @examples
+#' \dontrun{
+#' getOntoMultiMapping(ont = ont, onts = c("CL0000548", "CL:0000066", "CL:0000082"))
+#' }
 #' @importFrom purrr flatten_chr
 #' @export
 
@@ -223,13 +244,17 @@ getOntoMultiMapping <- function(ont, onts) {
 
 
 #' Core function of scOntoMatch
-#' Match the ontology annotation of multiple obj objects
+#' Match the ontology annotation of multiple seurat objects
 #' @name ontoMultiMatch
 #' @param obj_list a namesd list of seurat objects to match
 #' @param ont ontologyIndex object
 #' @param anno_col the cell ontology text annotation column name
 #' @param onto_id_col if also have ontology id column for direct mapping
-#' @return a list of obj objects with annotation ontology mapped to each-other in obs[['cell_ontology_mapped']]
+#' @return a list of seurat objects with annotation ontology mapped to each-other in obs[['cell_ontology_mapped']]
+#' @examples
+#' \dontrun{
+#' ontoMultiMatch(seurat_obj_list, ont, "ontology_name", 'ontology_id')
+#' }
 #' @export
 
 ontoMultiMatch <- function(obj_list, anno_col, onto_id_col, ont) {
@@ -254,56 +279,6 @@ ontoMultiMatch <- function(obj_list, anno_col, onto_id_col, ont) {
 }
 
 
-#' In a matched ontology tree there could be simultaneously ancestral terms and descendant terms within each dataset,
-#' this function takes the output of ontoMatch and merge descendant terms to ancestor terms, while not over-merge
-#' @name ontoMatchMinimal
-#' @param ont ontology object
-#' @param obj_list a list of obj files from the output of ontoMatch
-#' @return a list of obj files with minimal ontology mapped to each other in obs[['cell_type_mapped_ontology_base']]
-#' @importFrom ontologyIndex get_OBO get_ancestors get_descendants minimal_set
-#' @export
-
-
-ontoMatchMinimal <- function(obj_list, ont) {
-
-  # the new ontology terms that has been mapped between datasets
-  new_all <- unique(c(names(getOntologyId(obj_list[[1]]@meta.data[["cell_type_mapped_ontology"]], ont = ont)), names(getOntologyId(obj_list[[2]]@meta.data[["cell_type_mapped_ontology"]], ont = ont))))
-
-  # minimal_set(ont, new_all) is all the leaf terms in the current joint ontology tree
-  # setdiff(new_all, minimal_set(ont, new_all)) contains intermediate terms
-  # minimal_set(ont, setdiff(new_all, minimal_set(ont, new_all))) contains leaf terms among intermediate terms to avoid over-merging
-  # that gives the removed_terms for us to match to its ancestor in intermediate terms
-  removed_terms_all <- setdiff(new_all, minimal_set(ont, new_all))
-  removed_terms <- setdiff(removed_terms_all, minimal_set(ont, removed_terms_all))
-
-  new_terms_one <- names(getOntologyId(obj_list[[1]]@meta.data[["cell_type_mapped_ontology"]], ont = ont))
-  new_terms_two <- names(getOntologyId(obj_list[[2]]@meta.data[["cell_type_mapped_ontology"]], ont = ont))
-
-  # get the mapping between elements to match to ancestor and the ancestor
-  # it gives the same result to use new_terms_one or new_terms_two in the following line
-  to_minimize <- new_terms_one[new_terms_one %in% get_descendants(ontology = ont, roots = removed_terms) & !(new_terms_one %in% removed_terms)]
-  common_base <- lapply(structure(to_minimize, names = to_minimize), function(x) removed_terms[unlist(lapply(removed_terms, function(y) x %in% get_descendants(ontology = ont, roots = y)))])
-  common_base <- common_base[unlist(lapply(common_base, function(x) length(x) > 0))]
-  mappings <- unlist(common_base, use.names = TRUE)
-
-  # from previously unified annotation
-  obj_list[[1]]@meta.data[["cell_type_mapped_ontology_base"]] <- obj_list[[1]]@meta.data[["cell_type_mapped_ontology"]]
-  obj_list[[2]]@meta.data[["cell_type_mapped_ontology_base"]] <- obj_list[[2]]@meta.data[["cell_type_mapped_ontology"]]
-
-  ## perform mapping
-  for (fromTerm in names(mappings)) {
-    toTerm <- mappings[fromTerm]
-    fromName <- ont$name[names(ont$id[ont$id == fromTerm])]
-    toName <- ont$name[names(ont$id[ont$id == toTerm])]
-    message(paste("mapping from name: ", fromName, " to name: ", toName, sep = ""))
-    obj_list[[1]]@meta.data[which(obj_list[[1]]@meta.data[["cell_type_mapped_ontology"]] == fromName), "cell_type_mapped_ontology_base"] <- toName
-    obj_list[[2]]@meta.data[which(obj_list[[2]]@meta.data[["cell_type_mapped_ontology"]] == fromName), "cell_type_mapped_ontology_base"] <- toName
-  }
-
-  return(obj_list)
-}
-
-
 
 
 #' Plot a tree representation of ontology terms
@@ -315,6 +290,10 @@ ontoMatchMinimal <- function(obj_list, ont) {
 #' @param ... additional parameters for ontologyPlot::onto_plot
 #' @param roots root ontology in tree, default "animal cells" in cell ontology
 #' @return an ontology tree plot
+#' @examples
+#' \dontrun{
+#' plotOntoTree(ont = ont, onts = c("CL:0000066", "CL:0000082"), ont_query = c("CL:0000082"))
+#' }
 #' @importFrom ontologyPlot onto_plot
 #' @importFrom ontologyIndex get_ancestors intersection_with_descendants
 #' @export
@@ -348,12 +327,16 @@ plotOntoTree <- function(ont, onts, plot_ancestors = TRUE, ont_query = NULL, roo
 #' @param ... additional parameters for ontologyPlot::onto_plot
 #' @param roots root ontology in tree to plot, default "animal cells" in cell ontology
 #' @return a lit of matched ontology tree plot
+#' @examples
+#' \dontrun{
+#' plotMatchedOntoTree(seurat_obj_list, ont, 'cell_ontology_mapped', 'ontology_id')
+#' }
 #' @importFrom ontologyPlot onto_plot
 #' @importFrom purrr flatten_chr
 #' @importFrom ontologyIndex get_ancestors intersection_with_descendants
 #' @export
 #'
-plotMatchedOntoTree <- function(obj_list, ont, anno_col, onto_id_col, roots = c("CL:0000548"), ...) {
+plotMatchedOntoTree <- function(obj_list, ont, anno_col = 'cell_ontology_mapped', onto_id_col, roots = c("CL:0000548"), ...) {
   plots <- list()
   onts <- suppressMessages(ontoTranslate(obj_list, ont, onto_id_col, anno_col = anno_col))
   all <- unique(flatten_chr(onts))

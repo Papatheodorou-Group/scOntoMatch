@@ -21,9 +21,8 @@ knitr::opts_chunk$set(echo = TRUE, dpi=300)
 ```{r install}
 
 ## install from source
-if (!require("devtools")) install.packages("devtools")
-devtools::install_github("YY-SONG0718/scOntoMatch", ref = 'seurat_obj')
-
+## library(devtools)
+## devtools::install_github("YY-SONG0718/scOntoMatch")
 library(scOntoMatch)
 library(ontologyIndex)
 ```

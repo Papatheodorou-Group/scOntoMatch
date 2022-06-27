@@ -2,15 +2,23 @@
 % Please edit documentation in R/helper_functions.R
 \name{getSeuratRds}
 \alias{getSeuratRds}
-\title{read in anndata files as a named list of anndata object}
+\title{read in seurat object .rds files as a named list of seurat object}
 \usage{
 getSeuratRds(metadata, sep)
 }
 \arguments{
-\item{metadata}{a metadata file indicating name, path to seurat rds file}
+\item{metadata}{a metadata file indicating name, path to 'seurat' rds file}
 
 \item{sep}{sep of the metadata file}
 }
+\value{
+a named list contains data name and the corresponding 'seurat' object
+}
 \description{
-read in anndata files as a named list of anndata object
+read in seurat object .rds files as a named list of seurat object
+}
+\examples{
+\dontrun{
+getSeuratRds(metadata = 'metadata.tsv', sep = '\t')
+}
 }

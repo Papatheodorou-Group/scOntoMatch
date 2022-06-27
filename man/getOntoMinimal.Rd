@@ -12,8 +12,13 @@ getOntoMinimal(ont, onts)
 \item{onts}{a character vector of ontology id}
 }
 \value{
-a names list for ontology id mapping looks like ontology_id:ontology_id
+a named list for ontology id mapping looks like ontology_id:ontology_id
 }
 \description{
 match descendant terms to ancestor terms within a dataset
+}
+\examples{
+\dontrun{
+getOntoMinimal(ont = ont, onts = c("CL0000548", "CL:0000066", "CL:0000082"))
+}
 }

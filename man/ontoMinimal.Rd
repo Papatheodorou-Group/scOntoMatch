@@ -17,9 +17,14 @@ ontoMinimal(obj, ont, anno_col, onto_id_col)
 \item{onto_id_col}{if also have ontology id column for direct mapping}
 }
 \value{
-an anndata object with .obs[["cell_ontology_base"]]
+an seurat object with  meta.data[["cell_ontology_base"]]
 }
 \description{
 get the minimal ontology tree of a dataset by reducing descendant terms to ancestor terms
 return  obj meta.data[["cell_ontology_base"]] storing the reduced ontology annotation
+}
+\examples{
+\dontrun{
+ontoMinimal(obj = seurat_obj, ont = ont, anno_col = 'ontology_name', onto_id_col = 'ontology_id')
+}
 }

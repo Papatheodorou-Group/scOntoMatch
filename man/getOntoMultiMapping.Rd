@@ -17,3 +17,8 @@ a named character of mapping from:mapping to
 \description{
 Match descendants to ancestors in multiple ontology id lists
 }
+\examples{
+\dontrun{
+getOntoMultiMapping(ont = ont, onts = c("CL0000548", "CL:0000066", "CL:0000082"))
+}
+}

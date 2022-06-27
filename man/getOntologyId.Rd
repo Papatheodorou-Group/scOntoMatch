@@ -4,16 +4,21 @@
 \alias{getOntologyId}
 \title{Get a names list of ontology and id by name}
 \usage{
-getOntologyId(onto_name, ont)
+getOntologyId(ont, onto_name)
 }
 \arguments{
-\item{onto_name}{character vector of ontology names}
-
 \item{ont}{ontology object}
+
+\item{onto_name}{character vector of ontology names}
 }
 \value{
 a named list mapping ontology id and ontology name
 }
 \description{
 Get a names list of ontology and id by name
+}
+\examples{
+\dontrun{
+getOntologyId(onto_name = "epithelial cell of lung", ont = ont)
+}
 }

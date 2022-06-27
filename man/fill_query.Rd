@@ -17,3 +17,8 @@ a color object to fill query in onto_plot
 \description{
 Get a names list of ontology and id by id
 }
+\examples{
+\dontrun{
+fill_query(all = c("CL0000548", "CL:0000066", "CL:0000082"), query = c("CL:0000082"))
+}
+}

@@ -21,3 +21,8 @@ a named list of cell ontology ids
 \description{
 translate named list of obj_list to named list of cell ontology ids per obj
 }
+\examples{
+\dontrun{
+ontoTranslate(seurat_obj_list, ont, 'ontology_name', 'ontology_id')
+}
+}

@@ -14,8 +14,13 @@ getOntoMapping(ont, onts1, onts2)
 \item{onts2}{a character vector of ontology id}
 }
 \value{
-a names list for ontology id mapping looks like ontology_id:ontology_id
+a named list for ontology id mapping looks like ontology_id:ontology_id
 }
 \description{
 match ontology terms by direct mapping and mapping descendants to ancestors
+}
+\examples{
+\dontrun{
+getOntoMapping(ont = ont, onts1 = "CL:0000548", onts2 = c("CL0000548", "CL:0000066"))
+}
 }

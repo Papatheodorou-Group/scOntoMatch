@@ -32,3 +32,8 @@ an ontology tree plot
 \description{
 Plot a tree representation of ontology terms
 }
+\examples{
+\dontrun{
+plotOntoTree(ont = ont, onts = c("CL:0000066", "CL:0000082"), ont_query = c("CL:0000082"))
+}
+}

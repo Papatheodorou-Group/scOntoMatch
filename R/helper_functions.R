@@ -1,9 +1,14 @@
 
-#' read in anndata files as a named list of anndata object
+#' read in seurat object .rds files as a named list of seurat object
 #' @name getSeuratRds
-#' @param metadata a metadata file indicating name, path to seurat rds file
+#' @param metadata a metadata file indicating name, path to 'seurat' rds file
 #' @param sep sep of the metadata file
 #' @importFrom utils read.table setTxtProgressBar txtProgressBar
+#' @return a named list contains data name and the corresponding 'seurat' object
+#' @examples
+#' \dontrun{
+#' getSeuratRds(metadata = 'metadata.tsv', sep = '\t')
+#' }
 #' @export
 #'
 getSeuratRds <- function(metadata, sep ) {
@@ -43,8 +48,7 @@ getSeuratRds <- function(metadata, sep ) {
 #' @param onts ontology ids from translate
 #' @param ont ontologyIndex object
 #' @param anno_col annotation column in obj@meta.data that is translated to onts ids
-#' @export
-#'
+#' @return do not return a value but output messages
 
 
 check_ontology_translate <- function(obj, onts, ont, anno_col) {
@@ -64,10 +68,14 @@ check_ontology_translate <- function(obj, onts, ont, anno_col) {
 #' @param onto_name character vector of ontology names
 #' @param ont ontology object
 #' @return a named list mapping ontology id and ontology name
+#' @examples
+#' \dontrun{
+#' getOntologyId(onto_name = "epithelial cell of lung", ont = ont)
+#' }
 #' @export
 
 
-getOntologyId <- function(onto_name, ont) {
+getOntologyId <- function(ont, onto_name) {
   return(ont$name[names(ont$id[ont$name %in% levels(factor(onto_name))])])
 }
 
@@ -76,10 +84,14 @@ getOntologyId <- function(onto_name, ont) {
 #' @param onto_id character vector of ontology ids
 #' @param ont ontology object
 #' @return a named list mapping ontology id and ontology name
+#' @examples
+#' \dontrun{
+#' getOntologyName(onto_id = "epithelial cell of lung", ont = ont)
+#' }
 #' @export
 
 
-getOntologyName <- function(onto_id, ont) {
+getOntologyName <- function(ont, onto_id) {
   return(ont$name[names(ont$id[ont$id %in% levels(factor(onto_id))])])
 }
 
@@ -89,6 +101,10 @@ getOntologyName <- function(onto_id, ont) {
 #' @param all all ontology id to plot tree
 #' @param query query ontology id to fill
 #' @return a color object to fill query in onto_plot
+#' @examples
+#' \dontrun{
+#' fill_query(all = c("CL0000548", "CL:0000066", "CL:0000082"), query = c("CL:0000082"))
+#' }
 #' @export
 
 fill_query <- function(all, query) {

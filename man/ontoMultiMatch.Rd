@@ -3,7 +3,7 @@
 \name{ontoMultiMatch}
 \alias{ontoMultiMatch}
 \title{Core function of scOntoMatch
-Match the ontology annotation of multiple obj objects}
+Match the ontology annotation of multiple seurat objects}
 \usage{
 ontoMultiMatch(obj_list, anno_col, onto_id_col, ont)
 }
@@ -17,9 +17,14 @@ ontoMultiMatch(obj_list, anno_col, onto_id_col, ont)
 \item{ont}{ontologyIndex object}
 }
 \value{
-a list of obj objects with annotation ontology mapped to each-other in obs[['cell_ontology_mapped']]
+a list of seurat objects with annotation ontology mapped to each-other in obs[['cell_ontology_mapped']]
 }
 \description{
 Core function of scOntoMatch
-Match the ontology annotation of multiple obj objects
+Match the ontology annotation of multiple seurat objects
+}
+\examples{
+\dontrun{
+ontoMultiMatch(seurat_obj_list, ont, "ontology_name", 'ontology_id')
+}
 }

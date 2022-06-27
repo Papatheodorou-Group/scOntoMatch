@@ -7,7 +7,7 @@
 plotMatchedOntoTree(
   obj_list,
   ont,
-  anno_col,
+  anno_col = "cell_ontology_mapped",
   onto_id_col,
   roots = c("CL:0000548"),
   ...
@@ -31,4 +31,9 @@ a lit of matched ontology tree plot
 }
 \description{
 Plot a ontology tree with matched ontology from ontoMatch
+}
+\examples{
+\dontrun{
+plotMatchedOntoTree(seurat_obj_list, ont, 'cell_ontology_mapped', 'ontology_id')
+}
 }
