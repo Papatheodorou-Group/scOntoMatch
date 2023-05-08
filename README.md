@@ -1,6 +1,7 @@
 # scOntoMatch
 scOntoMatch is an R package which unifies ontology annotation of scRNA-seq datasets to make them comparable across studies.
 
+![cran downloads](https://cranlogs.r-pkg.org/badges/grand-total/scOntoMatch)
 
 Author&Maintainer: Yuyao Song <ysong@ebi.ac.uk>
 
