@@ -13,7 +13,7 @@ This package aims to match ontology labels between different datasets to make th
 ## from source
 
 install.packages("devtools")
-devtools::install_github("YY-SONG0718/scOntoMatch")
+devtools::install_github("Papatheodorou-Group/scOntoMatch")
 library(scOntoMatch)
 library(ontologyIndex)
 ```
@@ -26,7 +26,7 @@ First download the ontology `.obo` file from [the OBO foundry](https://obofoundr
   -  [Drosophila gross anatomy (FBbt)](https://obofoundry.org/ontology/fbbt.html)
   -  [Zebrafish anatomy and development ontology (ZFA)](https://obofoundry.org/ontology/zfa.html)
 
-Refer to [vignette](https://github.com/YY-SONG0718/scOntoMatch/blob/main/vignettes/scOntoMatch_vignette.Rmd) for detailed usage.
+Refer to [vignette](https://github.com/Papatheodorou-Group/scOntoMatch/blob/main/vignettes/scOntoMatch_vignette.Rmd) for detailed usage.
 
 Get input ready
 ```
